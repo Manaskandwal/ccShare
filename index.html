@@ -1,0 +1,2367 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ccShare — Premium Credit Card Expense & Bill Reminder</title>
+  
+  <!-- Tailwind CSS v3 CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Font Integrations -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <!-- Design Config -->
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'Manrope', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              primary: '#10b981',
+              primaryDark: '#059669',
+              bgMain: '#0a0a0c',
+              bgSurface: '#131316',
+              border: 'rgba(255, 255, 255, 0.06)',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Premium Glassmorphism & Custom Themes */
+    :root {
+      --bg-main: #0a0a0c;
+      --bg-surface: #131316;
+      --bg-surface-hover: #1e1e24;
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --border-main: rgba(255, 255, 255, 0.06);
+      --border-focus: rgba(16, 185, 129, 0.3);
+    }
+
+    [data-theme="light"] {
+      --bg-main: #f1f5f9;
+      --bg-surface: #ffffff;
+      --bg-surface-hover: #f8fafc;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border-main: rgba(15, 23, 42, 0.08);
+      --border-focus: rgba(16, 185, 129, 0.5);
+    }
+
+    body {
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    .glass-surface {
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border-main);
+    }
+
+    .glass-surface-hover:hover {
+      background-color: var(--bg-surface-hover);
+    }
+
+    .border-theme {
+      border-color: var(--border-main);
+    }
+
+    .text-theme-muted {
+      color: var(--text-muted);
+    }
+
+    /* Custom Scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--border-main);
+      border-radius: 99px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #10b981;
+    }
+
+    /* Pulse micro-animation */
+    @keyframes pulseSlow {
+      0%, 100% { opacity: 0.3; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.03); }
+    }
+    .animate-pulse-slow {
+      animation: pulseSlow 4s ease-in-out infinite;
+    }
+
+    /* Standard Select Dropdowns option visibility styling */
+    select {
+      color: var(--text-main) !important;
+    }
+    select option {
+      background-color: var(--bg-surface) !important;
+      color: var(--text-main) !important;
+    }
+  </style>
+</head>
+<body class="h-full flex flex-col justify-between">
+
+  <!-- ============================================================== -->
+  <!-- ============ PAGE: LOGIN SCREEN ============================== -->
+  <!-- ============================================================== -->
+  <div id="login-screen" class="hidden min-h-screen flex items-center justify-center p-4 relative overflow-hidden bg-[#0a0a0c]">
+    <!-- Animated background blobs -->
+    <div class="absolute w-[30rem] h-[30rem] rounded-full bg-emerald-500/10 -top-40 -left-40 blur-3xl animate-pulse-slow"></div>
+    <div class="absolute w-[30rem] h-[30rem] rounded-full bg-indigo-500/10 -bottom-40 -right-40 blur-3xl animate-pulse-slow" style="animation-delay: 2s;"></div>
+
+    <div class="w-full max-w-md glass-surface p-8 rounded-3xl shadow-2xl relative border border-white/5 bg-[#131316]">
+      <div class="flex flex-col items-center gap-3 mb-8">
+        <div class="p-3 bg-gradient-to-tr from-emerald-400 to-teal-600 rounded-2xl text-white shadow-lg">
+          <i data-lucide="credit-card" class="w-8 h-8"></i>
+        </div>
+        <h2 class="text-2xl font-black tracking-tight text-white mt-2">ccShare</h2>
+        <p class="text-xs text-gray-400 font-medium uppercase tracking-wider">Credit Card Expense & Splitting</p>
+      </div>
+
+      <form onsubmit="handleLogin(event)" class="space-y-5">
+        <div class="flex flex-col gap-1.5">
+          <label class="text-xs font-bold text-gray-400">Email Address</label>
+          <div class="relative">
+            <i data-lucide="mail" class="w-4 h-4 text-gray-500 absolute left-3 top-1/2 -translate-y-1/2"></i>
+            <input type="email" id="login-email" required placeholder="e.g. manas@gmail.com" class="w-full bg-black/30 border border-white/5 rounded-xl py-3 pl-10 pr-4 text-xs text-white focus:outline-none focus:border-emerald-500 transition">
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+          <label class="text-xs font-bold text-gray-400">Password</label>
+          <div class="relative">
+            <i data-lucide="lock" class="w-4 h-4 text-gray-500 absolute left-3 top-1/2 -translate-y-1/2"></i>
+            <input type="password" id="login-password" required placeholder="••••••••" class="w-full bg-black/30 border border-white/5 rounded-xl py-3 pl-10 pr-4 text-xs text-white focus:outline-none focus:border-emerald-500 transition">
+          </div>
+        </div>
+
+        <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold py-3.5 rounded-xl transition shadow-lg mt-3">
+          Sign In
+        </button>
+      </form>
+
+      <!-- Testing Helper Credentials Block -->
+      <div class="mt-8 border-t border-white/5 pt-6 text-[10px] text-gray-500 space-y-2">
+        <span class="font-extrabold uppercase tracking-wider block text-gray-400">Demo Login Details:</span>
+        <div class="flex justify-between items-center py-1 border-b border-white/5">
+          <span>👑 Admin Email: <span class="font-bold text-gray-300">manaskandwal@gmail.com</span></span>
+          <span class="bg-white/5 px-1.5 py-0.5 rounded text-gray-300 font-bold">jackey@123</span>
+        </div>
+        <div id="dynamic-login-details" class="space-y-0">
+          <!-- Rendered dynamically -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- ============ PAGE: MAIN WORKSPACE ============================ -->
+  <!-- ============================================================== -->
+  <div id="app-workspace" class="hidden flex-grow flex flex-col justify-between">
+    <div class="flex-grow flex flex-col">
+      <!-- --- HEADER --- -->
+      <header class="sticky top-0 z-40 glass-surface backdrop-blur-md shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="p-2.5 rounded-xl bg-gradient-to-tr from-emerald-400 to-teal-600 text-white shadow-md">
+              <i data-lucide="credit-card" class="w-6 h-6 animate-pulse-slow"></i>
+            </div>
+            <div>
+              <h1 class="text-lg font-extrabold tracking-tight">ccShare</h1>
+              <p class="text-[10px] text-theme-muted font-semibold tracking-wider uppercase">Standalone Expense Tracker</p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-4">
+            <!-- Theme Toggle -->
+            <button onclick="toggleTheme()" class="p-2 rounded-xl border border-theme text-theme-muted hover:text-theme-main hover:bg-black/10 dark:hover:bg-white/5 transition">
+              <i id="theme-icon" data-lucide="sun" class="w-5 h-5"></i>
+            </button>
+
+            <!-- Acting-as Role Selector (Only for Admin to Impersonate Friends) -->
+            <div id="role-selector-container" class="flex items-center gap-2 border border-theme rounded-xl px-3 py-1.5 glass-surface shadow-sm">
+              <i data-lucide="shield" class="w-4 h-4 text-theme-muted"></i>
+              <select id="role-selector" onchange="switchRole(this.value)" class="bg-transparent text-xs sm:text-sm font-bold focus:outline-none cursor-pointer text-current">
+                <!-- Rendered Dynamically -->
+              </select>
+            </div>
+
+            <!-- Friend Logged-In Display -->
+            <div id="friend-identity-badge" class="hidden flex items-center gap-2 border border-theme rounded-xl px-3.5 py-1.5 bg-black/5 dark:bg-white/5 text-xs font-bold">
+              <i data-lucide="user" class="w-4 h-4 text-emerald-400"></i>
+              <span id="friend-identity-name">Shubham Bhardwaj</span>
+            </div>
+
+            <!-- Logout Button -->
+            <button onclick="handleLogout()" class="p-2 rounded-xl border border-red-500/10 text-red-500/80 hover:text-red-500 hover:bg-red-500/5 transition flex items-center gap-1.5 text-xs font-bold">
+              <i data-lucide="log-out" class="w-4 h-4"></i> <span class="hidden sm:inline">Logout</span>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <!-- --- MAIN CONTENT --- -->
+      <main class="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 mt-8 pb-16 flex flex-col gap-6">
+        
+        <!-- --- NAVIGATION TABS --- -->
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          <div class="flex gap-1.5 p-1 bg-black/10 dark:bg-white/5 border border-theme rounded-2xl">
+            <button onclick="switchTab('dashboard')" id="tab-dashboard" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition">Overview</button>
+            <button onclick="switchTab('expenses')" id="tab-expenses" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition">Payments</button>
+            <button onclick="switchTab('cards')" id="tab-cards" class="admin-only px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition">My Cards</button>
+            <button onclick="switchTab('friends')" id="tab-friends" class="admin-only px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition">Friends</button>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <!-- Developer Tool Kit Toggle -->
+            <button onclick="toggleDevPanel()" class="admin-only text-xs font-semibold text-theme-muted hover:text-theme-main bg-black/10 dark:bg-white/5 px-3 py-2 rounded-xl border border-theme transition flex items-center gap-1.5">
+              <i data-lucide="sliders" class="w-3.5 h-3.5"></i> Testing Controls
+            </button>
+          </div>
+        </div>
+
+        <!-- ============================================================== -->
+        <!-- ============ TAB: DASHBOARD OVERVIEW ========================= -->
+        <!-- ============================================================== -->
+        <div id="view-dashboard" class="app-view hidden grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <!-- Central Panels -->
+          <div class="lg:col-span-2 space-y-8">
+            <!-- Stats row -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4" id="overview-stats-grid">
+              <!-- Rendered dynamically -->
+            </div>
+
+            <!-- Ledger Visual Insights -->
+            <div class="glass-surface p-6 rounded-3xl" id="analytics-section">
+              <h3 class="text-base font-extrabold mb-4">Financial Utilization & Dues</h3>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-8 items-center" id="analytics-container">
+                <!-- SVG Visual Render -->
+              </div>
+            </div>
+
+            <!-- Credit Cards Portfolio -->
+            <div>
+              <div class="flex justify-between items-center mb-4">
+                <h3 id="shared-cards-title" class="text-base font-extrabold">Active Shared Cards</h3>
+                <button onclick="openCardModal()" class="admin-only text-xs font-bold text-emerald-400 bg-emerald-400/10 border border-emerald-400/20 px-3 py-1.5 rounded-lg hover:bg-emerald-400/20 transition flex items-center gap-1">
+                  <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Card
+                </button>
+              </div>
+              <div id="dashboard-cards-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <!-- Cards render -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Sidebar Panels -->
+          <div class="space-y-8">
+            <!-- Billing Cycles & Countdown reminders -->
+            <div class="glass-surface p-5 rounded-3xl">
+              <h3 class="text-sm font-extrabold flex items-center gap-2 mb-4">
+                <i data-lucide="calendar" class="w-4 h-4 text-amber-500"></i> Upcoming Card Bills
+              </h3>
+              <div id="upcoming-bills-feed" class="space-y-3.5">
+                <!-- Dynamic due list -->
+              </div>
+            </div>
+
+            <!-- Friend balances summary table -->
+            <div class="admin-only glass-surface p-5 rounded-3xl">
+              <h3 class="text-sm font-extrabold flex items-center gap-2 mb-4">
+                <i data-lucide="users" class="w-4 h-4 text-emerald-400"></i> Friends Ledger Balance
+              </h3>
+              <div id="friends-ledger-summary" class="space-y-4">
+                <!-- Dynamic friends list -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============================================================== -->
+        <!-- ============ TAB: PAYMENTS LIST ============================= -->
+        <!-- ============================================================== -->
+        <div id="view-expenses" class="app-view hidden space-y-6">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+              <h2 class="text-xl font-extrabold">Payment Splits Records</h2>
+              <p class="text-xs text-theme-muted mt-0.5">List of all recorded expenses and their verification ledger.</p>
+            </div>
+            <button onclick="openExpenseModal()" class="admin-only bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2.5 px-4 rounded-xl shadow transition flex items-center gap-1.5">
+              <i data-lucide="plus" class="w-4 h-4"></i> Add Payment Record
+            </button>
+          </div>
+
+          <!-- Filters bar -->
+          <div class="glass-surface p-4 rounded-2xl flex flex-wrap gap-4 items-center">
+            <div class="flex-grow min-w-[200px] relative">
+              <i data-lucide="search" class="w-4 h-4 text-theme-muted absolute left-3 top-1/2 -translate-y-1/2"></i>
+              <input type="text" id="expense-search" oninput="render()" placeholder="Search expenses by title or comments..." class="w-full bg-black/10 dark:bg-white/5 border border-theme rounded-xl py-2 pl-9 pr-4 text-xs focus:outline-none focus:ring-1 focus:ring-emerald-500">
+            </div>
+            <div class="flex gap-3">
+              <select id="filter-card" onchange="render()" class="bg-black/10 dark:bg-white/5 border border-theme rounded-xl px-3 py-1.5 text-xs text-current font-semibold focus:outline-none">
+                <option value="all">All Cards</option>
+              </select>
+              <select id="filter-status" onchange="render()" class="bg-black/10 dark:bg-white/5 border border-theme rounded-xl px-3 py-1.5 text-xs text-current font-semibold focus:outline-none">
+                <option value="all">All Statuses</option>
+                <option value="pending">Pending Payback</option>
+                <option value="paid">Verifying Dues</option>
+                <option value="settled">Settled Splits</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Payments dynamic feed -->
+          <div id="expenses-feed-list" class="space-y-4">
+            <!-- Dynamic expense rows -->
+          </div>
+        </div>
+
+        <!-- ============================================================== -->
+        <!-- ============ TAB: CARDS PORTFOLIO ============================ -->
+        <!-- ============================================================== -->
+        <div id="view-cards" class="app-view hidden admin-only space-y-6">
+          <div class="flex justify-between items-center">
+            <div>
+              <h2 class="text-xl font-extrabold">My Credit Cards Portfolio</h2>
+              <p class="text-xs text-theme-muted mt-0.5">Editable list of active limits and credit billing cycles.</p>
+            </div>
+            <button onclick="openCardModal()" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2.5 px-4 rounded-xl shadow transition flex items-center gap-1.5">
+              <i data-lucide="plus" class="w-4 h-4"></i> Add Card
+            </button>
+          </div>
+          <div id="cards-feed-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Grid cards render -->
+          </div>
+        </div>
+
+        <!-- ============================================================== -->
+        <!-- ============ TAB: FRIENDS DATABASE =========================== -->
+        <!-- ============================================================== -->
+        <div id="view-friends" class="app-view hidden admin-only space-y-6">
+          <div class="flex justify-between items-center">
+            <div>
+              <h2 class="text-xl font-extrabold">Friends Database</h2>
+              <p class="text-xs text-theme-muted mt-0.5">Contact coordinates and total outstanding borrows.</p>
+            </div>
+            <button onclick="openFriendModal()" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2.5 px-4 rounded-xl shadow transition flex items-center gap-1.5">
+              <i data-lucide="plus" class="w-4 h-4"></i> Add Friend
+            </button>
+          </div>
+          <div id="friends-feed-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Friends list grid -->
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- ============ SPLIT DETAIL SIDE DRAWER (SLIDE OVER) ============ -->
+  <!-- ============================================================== -->
+  <div id="detail-drawer" class="fixed inset-0 z-50 hidden">
+    <!-- Backdrop -->
+    <div onclick="closeDrawer()" class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+    
+    <!-- Panel -->
+    <div class="absolute inset-y-0 right-0 w-full sm:max-w-md bg-white dark:bg-[#131316] border-l border-theme shadow-2xl flex flex-col justify-between">
+      <div class="p-4 border-b border-theme flex justify-between items-center bg-black/5 dark:bg-white/5">
+        <div class="flex items-center gap-2">
+          <i data-lucide="credit-card" class="w-4 h-4 text-emerald-400"></i>
+          <span class="font-bold text-sm">Split Transaction Ledger</span>
+        </div>
+        <button onclick="closeDrawer()" class="p-1 rounded-lg border border-theme hover:bg-black/10 dark:hover:bg-white/5 text-theme-muted hover:text-current transition">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Scrollable content -->
+      <div id="drawer-scroll" class="flex-grow overflow-y-auto p-5 space-y-6">
+        <!-- Rendered Dynamically -->
+      </div>
+
+      <!-- Footer Actions -->
+      <div id="drawer-footer" class="p-4 border-t border-theme bg-black/5 dark:bg-white/5 flex justify-between items-center">
+        <!-- Rendered Dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- ============ MODAL: ADD / EDIT CARD ========================== -->
+  <!-- ============================================================== -->
+  <div id="card-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+    <div class="glass-surface w-full max-w-sm p-6 rounded-3xl shadow-2xl relative">
+      <button onclick="closeCardModal()" class="absolute right-4 top-4 text-theme-muted hover:text-current transition">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+      <h3 class="text-base font-extrabold flex items-center gap-2 mb-4">
+        <i data-lucide="credit-card" class="w-5 h-5 text-emerald-400"></i>
+        <span id="card-modal-title">Add Shared Credit Card</span>
+      </h3>
+      <form id="card-form" onsubmit="saveCard(event)" class="space-y-4">
+        <input type="hidden" id="card-id">
+        <div class="flex flex-col gap-1">
+          <label class="text-xs font-bold text-theme-muted mb-1">Card Issuer / Name</label>
+          <input type="text" id="card-name" placeholder="e.g. Chase Sapphire Preferred" required class="w-full bg-black/10 dark:bg-white/5 border border-theme rounded-xl py-2.5 px-3.5 text-xs text-current focus:outline-none">
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div class="flex flex-col gap-1">
+            <label class="text-xs font-bold text-theme-muted mb-1">Credit Limit (₹)</label>
+            <input type="number" id="card-limit" placeholder="e.g. 100000" required class="w-full bg-black/10 dark:bg-white/5 border border-theme rounded-xl py-2.5 px-3.5 text-xs text-current focus:outline-none">
+          </div>
+          <div class="flex flex-col gap-1">
+            <label class="text-xs font-bold text-theme-muted mb-1">Card Last 4 Digits</label>
+            <input type="text" id="card-number" placeholder="e.g. 4321" maxLength="4" required class="w-full bg-black/10 dark:bg-white/5 border border-theme rounded-xl py-2.5 px-3.5 text-xs text-current focus:outline-none">
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div class="flex flex-col gap-1">
+            <label class="text-xs font-bold text-theme-muted mb-1">Bill Gen Date (Day)</label>
+            <select id="card-gen-date" class="w-full bg-black/10 dark:bg-white/5 border border-theme rounded-xl py-2.5 px-3.5 text-xs text-current focus:outline-none cursor-pointer">
+              <!-- 1-31 options filled dynamically -->
+            </select>
+          </div>
+          <div class="flex flex-col gap-1">
+            <label class="text-xs font-bold text-theme-muted mb-1">Bill Due Date (Day)</label>
+            <select id="card-due-date" class="w-full bg-black/10 dark:bg-white/5 border border-theme rounded-xl py-2.5 px-3.5 text-xs text-current focus:outline-none cursor-pointer">
+              <!-- 1-31 options filled dynamically -->
+            </select>
+          </div>
+        </div>
+        <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 rounded-xl transition shadow">Confirm Credit Card</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- ============ MODAL: ADD FRIEND =============================== -->
+  <!-- ============================================================== -->
+  <div id="friend-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+    <div class="glass-surface w-full max-w-sm p-6 rounded-3xl shadow-2xl relative">
+      <button onclick="closeFriendModal()" class="absolute right-4 top-4 text-theme-muted hover:text-current transition">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+      <h3 class="text-base font-extrabold flex items-center gap-2 mb-4">
+        <i data-lucide="users" class="w-5 h-5 text-teal-400"></i> Register Friend Profile
+      </h3>
+      <form id="friend-form" onsubmit="saveFriend(event)" class="space-y-4">
+        <div class="flex flex-col gap-1">
+          <label class="text-xs font-bold text-theme-muted mb-1">Friend's Full Name</label>
+          <input type="text" id="friend-name" oninput="autoGenerateFriendEmail(this.value)" placeholder="e.g. Shero Sharma" required class="w-full bg-black/10 dark:bg-white/5 border border-theme rounded-xl py-2.5 px-3.5 text-xs text-current focus:outline-none">
+        </div>
+        <div class="flex flex-col gap-1">
+          <label class="text-xs font-bold text-theme-muted mb-1">Email Address (Auto-Generated Login)</label>
+          <input type="email" id="friend-email" placeholder="e.g. shero@gmail.com" required class="w-full bg-black/10 dark:bg-white/5 border border-theme rounded-xl py-2.5 px-3.5 text-xs text-current focus:outline-none">
+          <span class="text-[9px] text-theme-muted font-bold block leading-none mt-1">Default Login Password: 123456</span>
+        </div>
+        <div class="flex flex-col gap-1">
+          <label class="text-xs font-bold text-theme-muted mb-1">Phone Number (For Reminders)</label>
+          <input type="tel" id="friend-phone" placeholder="e.g. +919876543210" required class="w-full bg-black/10 dark:bg-white/5 border border-theme rounded-xl py-2.5 px-3.5 text-xs text-current focus:outline-none">
+        </div>
+        <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 rounded-xl transition shadow">Register Profile</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- ============ MODAL: ADD EXPENSE PAYMENT ====================== -->
+  <!-- ============================================================== -->
+  <div id="expense-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm overflow-y-auto">
+    <div class="glass-surface w-full max-w-lg p-6 rounded-3xl shadow-2xl relative my-10">
+      <button onclick="closeExpenseModal()" class="absolute right-4 top-4 text-theme-muted hover:text-current transition">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+      <h3 class="text-base font-extrabold flex items-center gap-2 mb-4">
+        <i data-lucide="plus" class="w-5 h-5 text-indigo-400"></i> Record Splittable Expense
+      </h3>
+      <form id="expense-form" onsubmit="saveExpense(event)" class="space-y-4">
+        <div class="grid grid-cols-2 gap-4">
+          <div class="flex flex-col gap-1 col-span-2 sm:col-span-1">
+            <label class="text-xs font-bold text-theme-muted mb-1">Merchant / Title</label>
+            <input type="text" id="expense-title" placeholder="e.g. Zuma Restaurant Dinner" required class="w-full bg-black/10 dark:bg-white/5 border border-theme rounded-xl py-2.5 px-3.5 text-xs text-current focus:outline-none">
+          </div>
+          <div class="flex flex-col gap-1 col-span-2 sm:col-span-1">
+            <label class="text-xs font-bold text-theme-muted mb-1">Charged Credit Card</label>
+            <select id="expense-card" required class="w-full bg-black/10 dark:bg-white/5 border border-theme rounded-xl py-2.5 px-3.5 text-xs text-current focus:outline-none cursor-pointer">
+              <!-- Rendered Dynamically -->
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div class="flex flex-col gap-1">
+            <label class="text-xs font-bold text-theme-muted mb-1">Total Amount (₹)</label>
+            <input type="number" step="0.01" id="expense-amount" placeholder="e.g. 3200.00" oninput="recalculateSplitInputs()" required class="w-full bg-black/10 dark:bg-white/5 border border-theme rounded-xl py-2.5 px-3.5 text-xs text-current focus:outline-none">
+          </div>
+          <div class="flex flex-col gap-1">
+            <label class="text-xs font-bold text-theme-muted mb-1">Transaction Date</label>
+            <input type="date" id="expense-date" required class="w-full bg-black/10 dark:bg-white/5 border border-theme rounded-xl py-2.5 px-3.5 text-xs text-current focus:outline-none">
+          </div>
+        </div>
+
+        <!-- Participants Check list -->
+        <div class="flex flex-col gap-1">
+          <label class="text-xs font-bold text-theme-muted mb-1">Split Participants (Select friends to split with)</label>
+          <div id="expense-friend-selectors" class="flex flex-wrap gap-2.5 p-3 rounded-2xl bg-black/5 dark:bg-white/5 border border-theme">
+            <!-- Dynamic checks -->
+          </div>
+        </div>
+
+        <!-- Portions parameters matrix -->
+        <div id="split-matrix-container" class="hidden p-4 bg-black/5 dark:bg-white/5 rounded-2xl border border-theme space-y-4">
+          <div id="split-matrix-header" class="flex justify-between items-center">
+            <span class="text-xs font-bold">Split Logic</span>
+            <div class="flex border border-theme rounded-lg overflow-hidden bg-white dark:bg-[#131316]">
+              <button type="button" onclick="setSplitType('equal')" id="split-type-equal" class="px-2.5 py-1 text-[11px] font-bold">Equally</button>
+              <button type="button" onclick="setSplitType('custom')" id="split-type-custom" class="px-2.5 py-1 text-[11px] font-bold">Custom Share</button>
+            </div>
+          </div>
+          <div id="split-math-inputs" class="space-y-3">
+            <!-- Dynamic share parameters -->
+          </div>
+        </div>
+
+        <!-- File upload base64 -->
+        <div class="flex flex-col gap-1">
+          <label class="text-xs font-bold text-theme-muted mb-1">Payment Receipt / Screenshot (Optional)</label>
+          <div class="flex items-center gap-4">
+            <label class="flex-grow border border-theme border-dashed p-4 rounded-2xl text-center hover:bg-black/5 dark:hover:bg-white/5 cursor-pointer transition">
+              <input type="file" accept="image/*" onchange="readReceiptFile(this)" class="hidden">
+              <div class="flex flex-col items-center gap-1.5 text-xs text-theme-muted">
+                <i data-lucide="upload" class="w-5 h-5 text-indigo-400"></i>
+                <span>Upload receipt image (Max 2MB)</span>
+              </div>
+            </label>
+            <div id="receipt-preview-box" class="hidden relative rounded-xl overflow-hidden border border-theme w-16 h-16 bg-black/10">
+              <img id="receipt-preview-img" src="" class="w-full h-full object-cover">
+              <button type="button" onclick="removeReceiptFile()" class="absolute inset-0 bg-black/60 text-white flex items-center justify-center opacity-0 hover:opacity-100 transition">
+                <i data-lucide="x" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <label class="text-xs font-bold text-theme-muted mb-1">Comments / Description</label>
+          <textarea id="expense-notes" placeholder="e.g. Shared portions for Zuma dinner splits..." class="w-full h-20 bg-black/10 dark:bg-white/5 border border-theme rounded-xl py-2.5 px-3.5 text-xs text-current focus:outline-none resize-none"></textarea>
+        </div>
+
+        <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 rounded-xl transition shadow">Confirm Split Portions</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- ============ ZOOM LIGHTBOX =================================== -->
+  <!-- ============================================================== -->
+  <div id="lightbox" onclick="this.classList.add('hidden')" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/90 backdrop-blur">
+    <button class="absolute right-6 top-6 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition">
+      <i data-lucide="x" class="w-6 h-6"></i>
+    </button>
+    <img id="lightbox-img" src="" class="max-w-full max-h-[85vh] rounded-xl object-contain shadow-2xl border border-white/10">
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- ============ GLOBAL FLOATING TOAST NOTIFIER ================== -->
+  <!-- ============================================================== -->
+  <div id="toast-container" class="fixed top-4 right-4 z-50 flex flex-col gap-2.5 pointer-events-none">
+    <!-- Rendered dynamically -->
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- ============ FLOATING DEVELOPER PANEL (TESTING ONLY) ========= -->
+  <!-- ============================================================== -->
+  <div id="dev-toolkit-drawer" class="fixed bottom-0 inset-x-0 z-40 hidden border-t border-theme glass-surface p-4 shadow-2xl transition">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+      <div class="flex items-center gap-2">
+        <i data-lucide="sliders" class="w-4 h-4 text-emerald-400"></i>
+        <div>
+          <h4 class="text-xs font-extrabold">ccShare Developer Testing Toolkit</h4>
+          <p class="text-[10px] text-theme-muted mt-0.5">Use this toolkit to test the dashboard, then wipe clean for production use.</p>
+        </div>
+      </div>
+      <div class="flex gap-3">
+        <button onclick="loadTestData()" class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 font-bold text-xs py-2 px-4 rounded-xl transition flex items-center gap-1.5">
+          <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Load Test Data
+        </button>
+        <button onclick="wipeAllData()" class="bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20 font-bold text-xs py-2 px-4 rounded-xl transition flex items-center gap-1.5">
+          <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> WIPE ALL DATA (Clean Slate)
+        </button>
+        <button onclick="toggleDevPanel()" class="text-theme-muted hover:text-current font-bold text-xs px-3 py-2">Hide Panel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- ============ CORE ENGINE JS SCRIPT =========================== -->
+  <!-- ============================================================== -->
+  <script>
+    // --- Initial State Database Config ---
+    let state = {
+      cards: [],
+      users: [],
+      expenses: [],
+      currentRole: 'admin',
+      activeTab: 'dashboard',
+      selectedFriends: [], // For expense form
+      splitType: 'equal',
+      receiptBase64: null,
+      selectedExpenseId: null
+    };
+
+    // --- Hardcoded Security Config ---
+    const ADMIN_EMAIL = "manaskandwal@gmail.com";
+    const ADMIN_PASS = "jackey@123";
+
+    const HARDCODED_FRIENDS = [
+      { id: 'user-1', name: 'Shubham Bhardwaj', email: 'shubham@gmail.com', password: '123456', phone: '+919876543210', avatarColor: 'from-teal-400 to-emerald-500' },
+      { id: 'user-2', name: 'Ansh Bhatnagar', email: 'ansh@gmail.com', password: '123456', phone: '+919988776655', avatarColor: 'from-pink-400 to-rose-500' }
+    ];
+
+    // --- High Fidelity Test Seeds in Rupees (₹) ---
+    const TEST_CARDS = [
+      { id: 'card-1', name: 'Chase Sapphire Preferred', limit: 300000, billGenDate: 5, dueDate: 26, color: 'from-blue-600 to-indigo-900', number: '4321' },
+      { id: 'card-2', name: 'Amex Gold', limit: 500000, billGenDate: 12, dueDate: 3, color: 'from-amber-500 to-yellow-700', number: '8005' },
+      { id: 'card-3', name: 'Apple Card', limit: 150000, billGenDate: 1, dueDate: 31, color: 'from-zinc-700 to-zinc-950', number: '9120' }
+    ];
+
+    const TEST_EXP_IMAGE = "data:image/svg+xml;charset=utf-8,%3Csvg xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg' width%3D'400' height%3D'500' viewBox%3D'0 0 400 500'%3E%3Crect width%3D'400' height%3D'500' fill%3D'%231f2937'%2F%3E%3Ccircle cx%3D'200' cy%3D'120' r%3D'50' fill%3D'%2310b981' fill-opacity%3D'0.2'%2F%3E%3Cpath d%3D'M180 120 l15 15 l30 -30' stroke%3D'%2310b981' stroke-width%3D'6' stroke-linecap%3D'round' stroke-linejoin%3D'round' fill%3D'none'%2F%3E%3Ctext x%3D'200' y%3D'210' fill%3D'%23ffffff' font-size%3D'22' font-family%3D'sans-serif' text-anchor%3D'middle' font-weight%3D'bold'%3EPAYMENT SUCCESSFUL%3C%2Ftext%3E%3Ctext x%3D'200' y%3D'240' fill%3D'%239ca3af' font-size%3D'14' font-family%3D'sans-serif' text-anchor%3D'middle'%3EMerchant%3A Zuma London Restaurant%3C%2Ftext%3E%3Ctext x%3D'200' y%3D'320' fill%3D'%23ffffff' font-size%3D'24' font-family%3D'sans-serif' text-anchor%3D'middle' font-weight%3D'bold'%3E%E2%82%B93200.00%3C%2Ftext%3E%3C%2Fsvg%3E";
+
+    const TEST_EXPENSES = [
+      {
+        id: 'exp-1',
+        title: 'Dinner at Zuma Restaurant',
+        amount: 3200,
+        date: '2026-05-24',
+        cardId: 'card-1',
+        screenshot: TEST_EXP_IMAGE,
+        notes: 'Split equally for Riya’s birthday dinner.',
+        splitType: 'equal',
+        splits: [
+          { userId: 'user-1', amount: 1066.67, status: 'paid' },
+          { userId: 'user-2', amount: 1066.67, status: 'pending' }
+        ],
+        comments: [
+          { id: 'c-1', userId: 'user-1', userName: 'Shubham Bhardwaj', text: 'Sent via UPI just now, please verify!', timestamp: '2026-05-24T20:30:00Z' },
+          { id: 'c-2', userId: 'admin', userName: 'Admin (You)', text: 'Thanks Shubham, checking it out.', timestamp: '2026-05-24T21:00:00Z' }
+        ]
+      },
+      {
+        id: 'exp-2',
+        title: 'VIP Concert Tickets',
+        amount: 4500,
+        date: '2026-05-18',
+        cardId: 'card-2',
+        screenshot: null,
+        notes: 'Shubham got VIP seat (₹2500), Ansh standard VIP (₹2000).',
+        splitType: 'custom',
+        splits: [
+          { userId: 'user-1', amount: 2500, status: 'pending' },
+          { userId: 'user-2', amount: 2000, status: 'pending' }
+        ],
+        comments: []
+      }
+    ];
+
+    // --- Auto-generate email based on first name ---
+    function autoGenerateFriendEmail(nameVal) {
+      const name = nameVal.trim();
+      const emailInput = document.getElementById('friend-email');
+      
+      if (!name) {
+        emailInput.value = '';
+        return;
+      }
+
+      // Grab first word of name, lowercase it, strip special characters
+      const firstWord = name.split(/\s+/)[0].toLowerCase().replace(/[^a-z0-9]/g, '');
+      if (firstWord) {
+        emailInput.value = `${firstWord}@gmail.com`;
+      } else {
+        emailInput.value = '';
+      }
+    }
+
+    // --- Render dynamic credentials on login screen ---
+    function renderLoginCredentials() {
+      const container = document.getElementById('dynamic-login-details');
+      if (!container) return;
+      
+      container.innerHTML = '';
+      state.users.forEach((u, i) => {
+        const borderClass = i === state.users.length - 1 ? '' : 'border-b border-white/5';
+        const nameShort = u.name.split(' ')[0];
+        container.innerHTML += `
+          <div class="flex justify-between items-center py-1 ${borderClass}">
+            <span>👤 ${nameShort}: <span class="font-bold text-gray-300">${u.email}</span></span>
+            <span class="bg-white/5 px-1.5 py-0.5 rounded text-gray-300 font-bold">123456</span>
+          </div>
+        `;
+      });
+    }
+
+    // --- Toast Notifications Engine ---
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = `flex items-center gap-2.5 px-4.5 py-3 rounded-2xl shadow-xl border text-xs font-semibold text-white pointer-events-auto transform translate-y-2 opacity-0 transition-all duration-300 ${
+        type === 'success' ? 'bg-emerald-600 border-emerald-500' : 'bg-red-600 border-red-500'
+      }`;
+      
+      const icon = type === 'success' ? 'check-circle' : 'alert-circle';
+      toast.innerHTML = `<i data-lucide="${icon}" class="w-4.5 h-4.5"></i> <span>${message}</span>`;
+      
+      container.appendChild(toast);
+      lucide.createIcons();
+
+      // Trigger animation
+      setTimeout(() => {
+        toast.classList.remove('translate-y-2', 'opacity-0');
+      }, 10);
+
+      // Dismiss
+      setTimeout(() => {
+        toast.classList.add('translate-y-[-10px]', 'opacity-0');
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
+    // --- Auth Routing Engine ---
+    function handleLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById('login-email').value.trim().toLowerCase();
+      const pass = document.getElementById('login-password').value.trim();
+
+      if (email === ADMIN_EMAIL && pass === ADMIN_PASS) {
+        localStorage.setItem('cc_session_role', 'admin');
+        localStorage.setItem('cc_session_user', 'admin');
+        showToast('Welcome Back, Admin Manas! 👑');
+        bootWorkspace();
+        return;
+      }
+
+      // Check Friends credentials (both hardcoded and dynamically created in state.users)
+      const friendUser = state.users.find(f => f.email.toLowerCase() === email && (f.password === pass || pass === '123456'));
+      if (friendUser) {
+        localStorage.setItem('cc_session_role', 'friend');
+        localStorage.setItem('cc_session_user', friendUser.id);
+        showToast(`Welcome Back, ${friendUser.name}! 👤`);
+        bootWorkspace();
+        return;
+      }
+
+      showToast('Invalid Email or Password credentials!', 'error');
+    }
+
+    function handleLogout() {
+      localStorage.removeItem('cc_session_role');
+      localStorage.removeItem('cc_session_user');
+      closeDrawer();
+      
+      document.getElementById('app-workspace').classList.add('hidden');
+      document.getElementById('login-screen').classList.remove('hidden');
+      
+      showToast('Logged out successfully.');
+    }
+
+    function bootWorkspace() {
+      document.getElementById('login-screen').classList.add('hidden');
+      document.getElementById('app-workspace').classList.remove('hidden');
+
+      const role = localStorage.getItem('cc_session_role');
+      const userId = localStorage.getItem('cc_session_user');
+
+      const roleSelectorContainer = document.getElementById('role-selector-container');
+      const friendBadge = document.getElementById('friend-identity-badge');
+      const friendBadgeName = document.getElementById('friend-identity-name');
+
+      if (role === 'admin') {
+        state.currentRole = 'admin';
+        roleSelectorContainer.classList.remove('hidden');
+        friendBadge.classList.add('hidden');
+        
+        // Populate role selector dropdown
+        updateRoleSelector();
+        
+        // Allow Admin view to switch tab
+        const adminElements = document.querySelectorAll('.admin-only');
+        adminElements.forEach(el => el.classList.remove('hidden'));
+      } else {
+        // Logged in as specific Friend
+        state.currentRole = userId;
+        roleSelectorContainer.classList.add('hidden');
+        friendBadge.classList.remove('hidden');
+        
+        const fObj = state.users.find(u => u.id === userId);
+        friendBadgeName.textContent = fObj ? fObj.name : 'Friend Portal';
+
+        // Hide admin components
+        const adminElements = document.querySelectorAll('.admin-only');
+        adminElements.forEach(el => el.classList.add('hidden'));
+      }
+
+      switchTab('dashboard');
+      render();
+    }
+
+    // --- State Initialization & Load ---
+    window.addEventListener('DOMContentLoaded', () => {
+      // Set up card numbers day selector fields
+      const genSelect = document.getElementById('card-gen-date');
+      const dueSelect = document.getElementById('card-due-date');
+      for (let d = 1; d <= 31; d++) {
+        const genOpt = new Option(`${d}th day`, d);
+        const dueOpt = new Option(`${d}th day`, d);
+        genSelect.add(genOpt);
+        dueSelect.add(dueOpt);
+      }
+      genSelect.value = 5;
+      dueSelect.value = 26;
+
+      // Load Storage (Clean Slate by default on very first load)
+      const storedCards = localStorage.getItem('cc_share_cards');
+      const storedUsers = localStorage.getItem('cc_share_users');
+      const storedExpenses = localStorage.getItem('cc_share_expenses');
+
+      if (storedCards || storedUsers || storedExpenses) {
+        state.cards = storedCards ? JSON.parse(storedCards) : [];
+        state.users = storedUsers ? JSON.parse(storedUsers) : [];
+        state.expenses = storedExpenses ? JSON.parse(storedExpenses) : [];
+      } else {
+        // Boot first-load with pre-seeded users and data so credentials match immediately
+        state.cards = JSON.parse(JSON.stringify(TEST_CARDS));
+        // Friend registration is automatically populated with Shubham and Ansh
+        state.users = JSON.parse(JSON.stringify(HARDCODED_FRIENDS));
+        state.expenses = JSON.parse(JSON.stringify(TEST_EXPENSES));
+        saveState();
+      }
+
+      // Sync dark mode style attribute
+      const storedTheme = localStorage.getItem('theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', storedTheme);
+      document.documentElement.classList.toggle('dark', storedTheme === 'dark');
+      updateThemeIcon(storedTheme);
+
+      renderLoginCredentials();
+
+      // Check Session Login Routing
+      const loggedRole = localStorage.getItem('cc_session_role');
+      if (loggedRole) {
+        bootWorkspace();
+      } else {
+        document.getElementById('login-screen').classList.remove('hidden');
+      }
+
+      lucide.createIcons();
+    });
+
+    function saveState() {
+      localStorage.setItem('cc_share_cards', JSON.stringify(state.cards));
+      localStorage.setItem('cc_share_users', JSON.stringify(state.users));
+      localStorage.setItem('cc_share_expenses', JSON.stringify(state.expenses));
+    }
+
+    // --- Developer Control Toolkit ---
+    function toggleDevPanel() {
+      const el = document.getElementById('dev-toolkit-drawer');
+      el.classList.toggle('hidden');
+    }
+
+     function startFresh() {
+      state.cards = [];
+      // Keep hardcoded friends so login credentials don't break
+      state.users = JSON.parse(JSON.stringify(HARDCODED_FRIENDS));
+      state.expenses = [];
+      saveState();
+      
+      updateRoleSelector();
+      renderLoginCredentials();
+      render();
+      showToast('Initialized a clean slate database (kept Shubham and Ansh for logins)!');
+    }
+
+    function loadTestData() {
+      state.cards = JSON.parse(JSON.stringify(TEST_CARDS));
+      state.users = JSON.parse(JSON.stringify(HARDCODED_FRIENDS));
+      state.expenses = JSON.parse(JSON.stringify(TEST_EXPENSES));
+      saveState();
+
+      updateRoleSelector();
+      renderLoginCredentials();
+      render();
+      showToast('Loaded testing datasets in Rupees (₹)!');
+    }
+
+    function wipeAllData() {
+      if (confirm('Are you absolutely sure you want to completely clear all data? This deletes every card, user, and split.')) {
+        localStorage.clear();
+        state.cards = [];
+        state.users = JSON.parse(JSON.stringify(HARDCODED_FRIENDS)); // Keep Shubham & Ansh credentials active
+        state.expenses = [];
+        state.currentRole = 'admin';
+        state.selectedExpenseId = null;
+        
+        closeDrawer();
+        updateRoleSelector();
+        renderLoginCredentials();
+        saveState();
+        handleLogout();
+        showToast('All storage data wiped cleanly.', 'error');
+      }
+    }
+
+    // --- Theme Controller ---
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-theme') || 'dark';
+      const next = current === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      document.documentElement.classList.toggle('dark', next === 'dark');
+      localStorage.setItem('theme', next);
+      updateThemeIcon(next);
+    }
+
+    function updateThemeIcon(mode) {
+      const el = document.getElementById('theme-icon');
+      if (mode === 'dark') {
+        el.setAttribute('data-lucide', 'sun');
+      } else {
+        el.setAttribute('data-lucide', 'moon');
+      }
+      lucide.createIcons();
+    }
+
+    // --- Role Swapping Operations ---
+    function updateRoleSelector() {
+      const select = document.getElementById('role-selector');
+      select.innerHTML = '';
+      select.add(new Option('👑 Admin View', 'admin'));
+      state.users.forEach(u => {
+        select.add(new Option(`👤 ${u.name}`, u.id));
+      });
+      select.value = state.currentRole;
+    }
+
+    function switchRole(role) {
+      state.currentRole = role;
+      closeDrawer();
+      switchTab('dashboard');
+
+      render();
+      const roleName = role === 'admin' ? 'Admin' : state.users.find(u => u.id === role)?.name;
+      showToast(`Impersonating Profile: ${roleName}`);
+    }
+
+    function switchTab(tabId) {
+      state.activeTab = tabId;
+      
+      // Update Tab button UI
+      const tabs = ['dashboard', 'expenses', 'cards', 'friends'];
+      tabs.forEach(t => {
+        const btn = document.getElementById(`tab-${t}`);
+        if (!btn) return;
+        const isAdminTab = t === 'cards' || t === 'friends';
+        const extraClass = isAdminTab ? ' admin-only' : '';
+        if (t === tabId) {
+          btn.className = 'px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-emerald-500 text-white shadow-md transition' + extraClass;
+        } else {
+          btn.className = 'px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-theme-muted hover:bg-black/5 dark:hover:bg-white/5 hover:text-current transition' + extraClass;
+        }
+      });
+
+      // Update Tab Views
+      const views = ['dashboard', 'expenses', 'cards', 'friends'];
+      views.forEach(v => {
+        const viewEl = document.getElementById(`view-${v}`);
+        if (v === tabId) {
+          viewEl.classList.remove('hidden');
+        } else {
+          viewEl.classList.add('hidden');
+        }
+      });
+
+      render();
+    }
+
+    // --- Visual math due indicators ---
+    function getDueDaysStatus(dueDate) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0); // Reset time to midnight for exact date differences
+      
+      let target = new Date(today.getFullYear(), today.getMonth(), dueDate);
+      target.setHours(0, 0, 0, 0);
+      
+      // If the target day has already passed in the current month, shift to next month
+      if (target < today) {
+        target = new Date(today.getFullYear(), today.getMonth() + 1, dueDate);
+        target.setHours(0, 0, 0, 0);
+      }
+      
+      const diffTime = target - today;
+      const days = Math.round(diffTime / (1000 * 60 * 60 * 24));
+
+      if (days === 0) {
+        return { text: `Due Today!`, color: 'text-red-500 bg-red-500/10 font-bold border-red-500/20 border animate-pulse' };
+      } else if (days <= 3) {
+        return { text: `Due in ${days}d`, color: 'text-red-500 bg-red-500/10 font-bold border-red-500/20 border' };
+      } else if (days <= 7) {
+        return { text: `Due in ${days}d`, color: 'text-yellow-500 bg-yellow-500/10 font-semibold border-yellow-500/20 border' };
+      }
+      return { text: `Due in ${days}d`, color: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/10 border' };
+    }
+
+    // --- Math aggregate calculators ---
+    function calculateAggregateStats() {
+      let totalOutstanding = 0;
+      let totalLimit = state.cards.reduce((s, c) => s + c.limit, 0);
+      let cardSpent = {};
+
+      state.cards.forEach(c => cardSpent[c.id] = 0);
+
+      state.expenses.forEach(e => {
+        if (cardSpent[e.cardId] !== undefined) {
+          cardSpent[e.cardId] += e.amount;
+        }
+        e.splits.forEach(sp => {
+          if (sp.status !== 'settled') {
+            totalOutstanding += sp.amount;
+          }
+        });
+      });
+
+      const activeSpent = Object.values(cardSpent).reduce((a, b) => a + b, 0);
+      const utilPercent = totalLimit > 0 ? (activeSpent / totalLimit) * 100 : 0;
+
+      return { totalOutstanding, totalLimit, totalSpent: activeSpent, utilization: utilPercent, cardSpent };
+    }
+
+    function calculateFriendStats() {
+      let outstanding = 0;
+      let awaitingApproval = 0;
+      let settled = 0;
+      let count = 0;
+
+      state.expenses.forEach(e => {
+        const split = e.splits.find(sp => sp.userId === state.currentRole);
+        if (split) {
+          count++;
+          if (split.status === 'pending') outstanding += split.amount;
+          else if (split.status === 'paid') awaitingApproval += split.amount;
+          else if (split.status === 'settled') settled += split.amount;
+        }
+      });
+
+      return { outstanding, awaitingApproval, settled, totalCount: count };
+    }
+
+    // --- Card Modals ---
+    function openCardModal(cardId = null) {
+      document.getElementById('card-modal').classList.remove('hidden');
+      const form = document.getElementById('card-form');
+      form.reset();
+
+      if (cardId) {
+        const card = state.cards.find(c => c.id === cardId);
+        document.getElementById('card-modal-title').textContent = 'Modify Credit Card';
+        document.getElementById('card-id').value = card.id;
+        document.getElementById('card-name').value = card.name;
+        document.getElementById('card-limit').value = card.limit;
+        document.getElementById('card-number').value = card.number;
+        document.getElementById('card-gen-date').value = card.billGenDate;
+        document.getElementById('card-due-date').value = card.dueDate;
+      } else {
+        document.getElementById('card-modal-title').textContent = 'Add Shared Credit Card';
+        document.getElementById('card-id').value = '';
+      }
+    }
+
+    function closeCardModal() {
+      document.getElementById('card-modal').classList.add('hidden');
+    }
+
+    // --- Friend Operations ---
+    function openFriendModal() {
+      document.getElementById('friend-modal').classList.remove('hidden');
+      document.getElementById('friend-form').reset();
+    }
+
+    function closeFriendModal() {
+      document.getElementById('friend-modal').classList.add('hidden');
+    }
+
+    function saveFriend(e) {
+      e.preventDefault();
+      const name = document.getElementById('friend-name').value;
+      const email = document.getElementById('friend-email').value;
+      const phone = document.getElementById('friend-phone').value;
+
+      const gradients = [
+        'from-teal-400 to-emerald-500',
+        'from-pink-400 to-rose-500',
+        'from-purple-400 to-indigo-500',
+        'from-amber-400 to-orange-500'
+      ];
+      const avatarColor = gradients[state.users.length % gradients.length];
+
+      // Standard friend created gets a default credentials password '123456'
+      const newFriend = { id: `user-${Date.now()}`, name, email, password: '123456', phone, avatarColor };
+      state.users.push(newFriend);
+
+      saveState();
+      closeFriendModal();
+      updateRoleSelector();
+      renderLoginCredentials();
+      render();
+      showToast(`${name} registered successfully!`);
+    }
+
+    function deleteFriend(userId) {
+      if (userId === 'user-1' || userId === 'user-2') {
+        showToast('Shubham and Ansh are core login profiles and cannot be deleted.', 'error');
+        return;
+      }
+
+      const friend = state.users.find(u => u.id === userId);
+      if (confirm(`Delete friend profile for "${friend.name}"? This removes them from all split payment entries.`)) {
+        
+        // Remove friend profile
+        state.users = state.users.filter(u => u.id !== userId);
+        
+        // Clean expenses splits associated with this deleted friend
+        state.expenses = state.expenses.map(e => {
+          const nextSplits = e.splits.filter(sp => sp.userId !== userId);
+          return { ...e, splits: nextSplits };
+        });
+
+        // If currently viewing deleted friend's portal role, default to admin
+        if (state.currentRole === userId) {
+          state.currentRole = 'admin';
+        }
+
+        saveState();
+        updateRoleSelector();
+        renderLoginCredentials();
+        render();
+        showToast('Friend profile deleted.', 'error');
+      }
+    }
+
+    function saveCard(e) {
+      e.preventDefault();
+      const id = document.getElementById('card-id').value;
+      const name = document.getElementById('card-name').value;
+      const limit = parseFloat(document.getElementById('card-limit').value);
+      const number = document.getElementById('card-number').value;
+      const billGenDate = parseInt(document.getElementById('card-gen-date').value);
+      const dueDate = parseInt(document.getElementById('card-due-date').value);
+
+      if (id) {
+        // Edit
+        state.cards = state.cards.map(c => c.id === id ? { ...c, name, limit, number, billGenDate, dueDate } : c);
+        showToast('Card parameters updated successfully!');
+      } else {
+        // Add
+        const gradients = [
+          'from-blue-600 to-indigo-900',
+          'from-emerald-500 to-teal-700',
+          'from-purple-600 to-pink-900',
+          'from-amber-500 to-orange-700',
+          'from-zinc-700 to-zinc-950'
+        ];
+        const color = gradients[state.cards.length % gradients.length];
+        const newCard = { id: `card-${Date.now()}`, name, limit, number, billGenDate, dueDate, color };
+        state.cards.push(newCard);
+        showToast('Credit card added portfolio!');
+      }
+
+      saveState();
+      closeCardModal();
+      render();
+    }
+
+    function deleteCard(cardId) {
+      if (confirm('Delete this card? All payment computations tied to it will clear.')) {
+        state.cards = state.cards.filter(c => c.id !== cardId);
+        state.expenses = state.expenses.filter(e => e.cardId !== cardId);
+        saveState();
+        render();
+        showToast('Card deleted.', 'error');
+      }
+    }
+
+    // --- Expense Management ---
+    function openExpenseModal() {
+      if (state.cards.length === 0 || state.users.length === 0) {
+        showToast('Please add at least one credit card and one friend first!', 'error');
+        return;
+      }
+
+      document.getElementById('expense-modal').classList.remove('hidden');
+      const form = document.getElementById('expense-form');
+      form.reset();
+      
+      state.selectedFriends = [];
+      state.splitType = 'single';
+      state.receiptBase64 = null;
+      document.getElementById('expense-date').value = new Date().toISOString().split('T')[0];
+
+      // Refresh selectors
+      const cardSelect = document.getElementById('expense-card');
+      cardSelect.innerHTML = '<option value="">Choose Card</option>';
+      state.cards.forEach(c => {
+        cardSelect.add(new Option(`${c.name} (..${c.number})`, c.id));
+      });
+
+      // Friends selectors checkboxes
+      const frsBox = document.getElementById('expense-friend-selectors');
+      frsBox.innerHTML = '';
+      state.users.forEach(u => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.id = `friend-sel-${u.id}`;
+        btn.className = 'px-3 py-1.5 rounded-lg font-bold text-xs border border-theme text-theme-muted hover:text-current transition';
+        btn.textContent = u.name;
+        btn.onclick = () => toggleFriendSplitSelector(u.id);
+        frsBox.appendChild(btn);
+      });
+
+      document.getElementById('split-matrix-container').classList.add('hidden');
+      document.getElementById('receipt-preview-box').classList.add('hidden');
+      
+      lucide.createIcons();
+    }
+
+    function closeExpenseModal() {
+      document.getElementById('expense-modal').classList.add('hidden');
+    }
+
+    function toggleFriendSplitSelector(userId) {
+      const idx = state.selectedFriends.indexOf(userId);
+      const btn = document.getElementById(`friend-sel-${userId}`);
+      
+      if (idx > -1) {
+        state.selectedFriends.splice(idx, 1);
+        btn.className = 'px-3 py-1.5 rounded-lg font-bold text-xs border border-theme text-theme-muted hover:text-current transition';
+      } else {
+        state.selectedFriends.push(userId);
+        btn.className = 'px-3 py-1.5 rounded-lg font-bold text-xs bg-emerald-500 text-white shadow transition';
+      }
+
+      const mat = document.getElementById('split-matrix-container');
+      if (state.selectedFriends.length > 0) {
+        mat.classList.remove('hidden');
+
+        // Dynamically toggle split logic selector based on selected friend count
+        const header = document.getElementById('split-matrix-header');
+        if (state.selectedFriends.length === 1) {
+          if (header) header.classList.add('hidden');
+          state.splitType = 'single';
+        } else {
+          if (header) header.classList.remove('hidden');
+          // If moving from 1 friend (single) to 2 or more, enforce custom split as the default choice
+          if (state.splitType === 'single') {
+            setSplitType('custom');
+          }
+        }
+        recalculateSplitInputs();
+      } else {
+        mat.classList.add('hidden');
+      }
+    }
+
+    function setSplitType(type) {
+      state.splitType = type;
+      const eqBtn = document.getElementById('split-type-equal');
+      const csBtn = document.getElementById('split-type-custom');
+
+      if (type === 'equal') {
+        eqBtn.className = 'px-2.5 py-1 text-[11px] font-bold bg-emerald-500 text-white transition';
+        csBtn.className = 'px-2.5 py-1 text-[11px] font-bold text-theme-muted hover:text-current transition';
+      } else {
+        csBtn.className = 'px-2.5 py-1 text-[11px] font-bold bg-emerald-500 text-white transition';
+        eqBtn.className = 'px-2.5 py-1 text-[11px] font-bold text-theme-muted hover:text-current transition';
+      }
+      recalculateSplitInputs();
+    }
+
+    function recalculateSplitInputs() {
+      const amtInput = parseFloat(document.getElementById('expense-amount').value) || 0;
+      const box = document.getElementById('split-math-inputs');
+      box.innerHTML = '';
+
+      if (state.selectedFriends.length === 0) return;
+
+      if (state.selectedFriends.length === 1) {
+        // Case 1: Exactly 1 friend selected. 100% of amount goes to them automatically.
+        const fId = state.selectedFriends[0];
+        const friend = state.users.find(u => u.id === fId);
+        
+        const p = document.createElement('p');
+        p.className = 'text-xs text-theme-muted leading-relaxed';
+        p.innerHTML = `Whole amount (100%) will be charged to <span class="font-extrabold text-theme-main">${friend?.name || 'friend'}</span>.<br>Their portion amount: <span class="font-black text-emerald-400">₹${amtInput.toFixed(2)}</span>`;
+        box.appendChild(p);
+      } else {
+        // Case 2: 2 or more friends selected. Either custom or equal.
+        if (state.splitType === 'equal') {
+          const share = (amtInput / state.selectedFriends.length).toFixed(2);
+          const p = document.createElement('p');
+          p.className = 'text-xs text-theme-muted leading-relaxed';
+          p.innerHTML = `Split total: <span class="font-extrabold text-theme-main">${state.selectedFriends.length} shares</span>.<br>Each share portion: <span class="font-black text-emerald-400">₹${share}</span>`;
+          box.appendChild(p);
+        } else {
+          state.selectedFriends.forEach(fId => {
+            const friend = state.users.find(u => u.id === fId);
+            const flex = document.createElement('div');
+            flex.className = 'flex items-center justify-between gap-3 text-xs';
+            flex.innerHTML = `
+              <span class="font-bold truncate max-w-[150px]">${friend?.name}</span>
+              <div class="relative w-32">
+                <span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-theme-muted font-bold">₹</span>
+                <input type="number" step="0.01" id="cust-share-${fId}" placeholder="0.00" class="w-full bg-black/10 dark:bg-white/5 border border-theme rounded-xl py-1.5 pl-6 pr-2 text-right focus:outline-none">
+              </div>
+            `;
+            box.appendChild(flex);
+          });
+        }
+      }
+    }
+
+    function readReceiptFile(input) {
+      const file = input.files[0];
+      if (!file) return;
+
+      if (file.size > 2 * 1024 * 1024) {
+        showToast('Receipt file size must be under 2MB!', 'error');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        state.receiptBase64 = reader.result;
+        document.getElementById('receipt-preview-img').src = reader.result;
+        document.getElementById('receipt-preview-box').classList.remove('hidden');
+        showToast('Receipt encoded successfully.');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function removeReceiptFile() {
+      state.receiptBase64 = null;
+      document.getElementById('receipt-preview-box').classList.add('hidden');
+      showToast('Receipt screenshot cleared.', 'error');
+    }
+
+    function saveExpense(e) {
+      e.preventDefault();
+      const title = document.getElementById('expense-title').value;
+      const cardId = document.getElementById('expense-card').value;
+      const amount = parseFloat(document.getElementById('expense-amount').value);
+      const date = document.getElementById('expense-date').value;
+      const notes = document.getElementById('expense-notes').value;
+
+      if (!title || !cardId || isNaN(amount) || state.selectedFriends.length === 0) {
+        showToast('Complete all merchant parameters and select friends.', 'error');
+        return;
+      }
+
+      let splits = [];
+      if (state.selectedFriends.length === 1) {
+        // Case 1: Exactly 1 friend selected. The entire amount goes to them automatically.
+        splits = [{ userId: state.selectedFriends[0], amount: amount, status: 'pending' }];
+      } else {
+        if (state.splitType === 'equal') {
+          const share = parseFloat((amount / state.selectedFriends.length).toFixed(2));
+          splits = state.selectedFriends.map(fId => ({ userId: fId, amount: share, status: 'pending' }));
+        } else {
+          let customSum = 0;
+          splits = state.selectedFriends.map(fId => {
+            const share = parseFloat(document.getElementById(`cust-share-${fId}`).value) || 0;
+            customSum += share;
+            return { userId: fId, amount: share, status: 'pending' };
+          });
+
+          if (customSum > amount) {
+            showToast(`Sum of shares (₹${customSum.toFixed(2)}) exceeds bill total (₹${amount.toFixed(2)})`, 'error');
+            return;
+          }
+        }
+      }
+
+      const newExpense = {
+        id: `exp-${Date.now()}`,
+        title,
+        cardId,
+        amount,
+        date,
+        notes,
+        splitType: state.selectedFriends.length === 1 ? 'single' : state.splitType,
+        splits,
+        screenshot: state.receiptBase64,
+        comments: []
+      };
+
+      state.expenses.push(newExpense);
+      saveState();
+      closeExpenseModal();
+      render();
+      showToast('Expense recorded and portions split!');
+    }
+
+    function deleteExpense(expId) {
+      if (confirm('Delete this entire record? This cannot be undone.')) {
+        state.expenses = state.expenses.filter(e => e.id !== expId);
+        saveState();
+        closeDrawer();
+        render();
+        showToast('Payment record cleared.', 'error');
+      }
+    }
+
+    // --- Ledger split toggle ---
+    function toggleSplitStatus(expId, userId, currentStatus) {
+      let nextStatus = 'pending';
+      if (currentStatus === 'pending') nextStatus = 'paid';
+      else if (currentStatus === 'paid') nextStatus = 'settled';
+
+      state.expenses = state.expenses.map(e => {
+        if (e.id === expId) {
+          const nextSplits = e.splits.map(s => s.userId === userId ? { ...s, status: nextStatus } : s);
+          return { ...e, splits: nextSplits };
+        }
+        return e;
+      });
+
+      saveState();
+      showToast(`Split portion marked as ${nextStatus.toUpperCase()}`);
+      
+      // Update drawer render
+      openDrawer(expId);
+      render();
+    }
+
+    function addComment(e, expId) {
+      e.preventDefault();
+      const txt = e.target.commentInput.value.trim();
+      if (!txt) return;
+
+      const userName = state.currentRole === 'admin' ? 'Admin (You)' : (state.users.find(u => u.id === state.currentRole)?.name || 'Friend');
+
+      const newComment = {
+        id: `c-${Date.now()}`,
+        userId: state.currentRole,
+        userName,
+        text: txt,
+        timestamp: new Date().toISOString()
+      };
+
+      state.expenses = state.expenses.map(exp => {
+        if (exp.id === expId) {
+          return { ...exp, comments: [...(exp.comments || []), newComment] };
+        }
+        return exp;
+      });
+
+      saveState();
+      e.target.reset();
+      openDrawer(expId);
+    }
+
+    // --- Precompiled reminder share intents ---
+    function remindFriend(userId, expId) {
+      const friend = state.users.find(u => u.id === userId);
+      const exp = state.expenses.find(e => e.id === expId);
+      const card = state.cards.find(c => c.id === exp.cardId);
+      const split = exp.splits.find(s => s.userId === userId);
+
+      const message = `Hi ${friend.name}! This is a friendly reminder for your share of ₹${split.amount.toFixed(2)} regarding "${exp.title}" charged on my ${card?.name || 'credit card'}. Please check the tracker to verify! Thanks!`;
+      const encoded = encodeURIComponent(message);
+
+      const whatsappUrl = `https://wa.me/${friend.phone.replace('+', '')}?text=${encoded}`;
+      const smsUrl = `sms:${friend.phone}?body=${encoded}`;
+
+      // Open small popup selector
+      const popup = window.open('', '_blank', 'width=450,height=300');
+      if (popup) {
+        popup.document.write(`
+          <html>
+            <head>
+              <title>Remind Friend</title>
+              <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+              <style>
+                body { background: #0f172a; color: #f1f5f9; font-family: sans-serif; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; padding: 20px; }
+              </style>
+            </head>
+            <body class="text-center">
+              <h2 class="text-xl font-bold mb-3">Remind ${friend.name}</h2>
+              <p class="text-gray-400 text-xs mb-5 max-w-sm">Launch quick share to send message for ₹${split.amount.toFixed(2)}.</p>
+              <div class="flex gap-4">
+                <a href="${whatsappUrl}" target="_blank" onclick="window.close()" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-5 rounded-lg transition">WhatsApp</a>
+                <a href="${smsUrl}" onclick="window.close()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-5 rounded-lg transition">Native SMS</a>
+              </div>
+              <button onclick="window.close()" class="mt-6 text-gray-500 hover:text-gray-300 text-xs">Cancel</button>
+            </body>
+          </html>
+        `);
+        popup.document.close();
+      } else {
+        window.open(whatsappUrl, '_blank');
+      }
+      showToast(`Reminder generated for ${friend.name}!`);
+    }
+
+    // --- Side Drawer operations ---
+    function openDrawer(expId) {
+      state.selectedExpenseId = expId;
+      const drawer = document.getElementById('detail-drawer');
+      const scroll = document.getElementById('drawer-scroll');
+      const footer = document.getElementById('drawer-footer');
+      
+      const exp = state.expenses.find(e => e.id === expId);
+      const card = state.cards.find(c => c.id === exp.cardId);
+
+      const totalFriendsPortion = exp.splits.reduce((s, a) => s + a.amount, 0);
+      const adminPortion = exp.amount - totalFriendsPortion;
+
+      drawer.classList.remove('hidden');
+      
+      // Build Scrollable markup
+      let splitsHTML = '';
+      exp.splits.forEach(sp => {
+        const friend = state.users.find(u => u.id === sp.userId);
+        if (!friend) return;
+
+        const isAdmin = state.currentRole === 'admin';
+        const isMe = state.currentRole === sp.userId;
+        if (!isAdmin && !isMe) return;
+
+        let actionButton = '';
+        if (isAdmin) {
+          const text = sp.status === 'settled' ? 'settled' : sp.status === 'paid' ? '✔ verify payback' : 'pending';
+          const btnClass = sp.status === 'settled' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20' :
+                           sp.status === 'paid' ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20 hover:bg-blue-500/20 animate-pulse' :
+                           'bg-amber-500/10 text-amber-500 border border-amber-500/20 hover:bg-amber-500/20';
+          actionButton = `<button onclick="toggleSplitStatus('${exp.id}', '${sp.userId}', '${sp.status}')" class="px-2.5 py-1 text-[10px] font-bold uppercase rounded-lg transition ${btnClass}">${text}</button>`;
+        } else if (isMe) {
+          if (sp.status === 'pending') {
+            actionButton = `<button onclick="toggleSplitStatus('${exp.id}', '${sp.userId}', 'pending')" class="bg-blue-500 hover:bg-blue-600 text-white font-extrabold px-2.5 py-1 text-[10px] uppercase rounded-lg transition">✔ Mark Paid</button>`;
+          } else {
+            const badge = sp.status === 'settled' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-blue-500/10 text-blue-400';
+            actionButton = `<span class="px-2 py-0.5 rounded text-[9px] font-black uppercase ${badge}">${sp.status === 'paid' ? 'Waiting verification' : 'Settled'}</span>`;
+          }
+        } else {
+          const badge = sp.status === 'settled' ? 'bg-emerald-500/10 text-emerald-400' : sp.status === 'paid' ? 'bg-blue-500/10 text-blue-400' : 'bg-amber-500/10 text-amber-500';
+          actionButton = `<span class="px-2.5 py-0.5 text-[9px] font-bold uppercase rounded-lg ${badge}">${sp.status}</span>`;
+        }
+
+        const reminderBtn = (isAdmin && sp.status === 'pending') ? `
+          <button onclick="remindFriend('${sp.userId}', '${exp.id}')" class="p-1 rounded bg-black/5 dark:bg-white/5 border border-theme hover:text-emerald-400 transition">
+            <i data-lucide="share-2" class="w-3.5 h-3.5"></i>
+          </button>
+        ` : '';
+
+        splitsHTML += `
+          <div class="flex justify-between items-center text-xs p-3 rounded-2xl border border-theme bg-white dark:bg-[#131316]">
+            <div class="flex items-center gap-2.5">
+              <div class="w-7 h-7 rounded-full bg-gradient-to-tr ${friend.avatarColor} text-white flex items-center justify-center font-bold text-[10px]">
+                ${friend.name.split(' ').map(n => n[0]).join('')}
+              </div>
+              <div>
+                <span class="font-extrabold block leading-tight">${friend.name}</span>
+                <span class="text-[10px] text-theme-muted font-bold mt-0.5">Share Portion: ₹${sp.amount.toFixed(2)}</span>
+              </div>
+            </div>
+            <div class="flex items-center gap-1.5">
+              ${actionButton}
+              ${reminderBtn}
+            </div>
+          </div>
+        `;
+      });
+
+      // Comments Thread HTML
+      let commentsHTML = '';
+      (exp.comments || []).forEach(c => {
+        commentsHTML += `
+          <div class="p-3 bg-black/5 dark:bg-white/5 border border-theme rounded-2xl text-xs space-y-1">
+            <div class="flex justify-between items-center">
+              <span class="font-extrabold">${c.userName}</span>
+              <span class="text-[9px] text-theme-muted font-semibold">${new Date(c.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+            </div>
+            <p class="text-theme-muted text-[11px] leading-relaxed">${c.text}</p>
+          </div>
+        `;
+      });
+
+      scroll.innerHTML = `
+        <div>
+          <span class="text-[9px] text-theme-muted font-bold uppercase tracking-wider block">${exp.date} · Charged on ${card?.name || 'Card'}</span>
+          <h2 class="text-lg font-black leading-tight mt-0.5">${exp.title}</h2>
+          <div class="mt-3.5 flex justify-between items-baseline border-b border-theme pb-3.5">
+            <span class="text-xs text-theme-muted font-semibold font-bold">Total Invoice Amount</span>
+            <span class="text-2xl font-black text-emerald-400">₹${exp.amount.toFixed(2)}</span>
+          </div>
+        </div>
+
+        ${exp.notes ? `
+          <div class="p-3.5 bg-black/5 dark:bg-white/5 border border-theme rounded-2xl text-xs text-theme-muted leading-relaxed">
+            <span class="font-bold text-current block mb-1">Invoice Notes</span>
+            ${exp.notes}
+          </div>
+        ` : ''}
+
+        ${exp.screenshot ? `
+          <div>
+            <h4 class="text-xs font-bold text-theme-muted uppercase tracking-wider mb-2">Receipt Screenshot</h4>
+            <div onclick="openLightbox('${exp.screenshot}')" class="relative rounded-2xl overflow-hidden border border-theme cursor-zoom-in group">
+              <img src="${exp.screenshot}" class="w-full h-44 object-cover object-top hover:scale-105 transition duration-300">
+              <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs font-bold transition gap-1">
+                <i data-lucide="eye" class="w-4 h-4"></i> View Invoice
+              </div>
+            </div>
+          </div>
+        ` : ''}
+
+        <div class="space-y-3">
+          <h4 class="text-xs font-bold text-theme-muted uppercase tracking-wider">Portion Splits Summary</h4>
+          
+          <div class="space-y-3">
+            <!-- Admin Portion -->
+            <div class="flex justify-between items-center text-xs p-3 rounded-2xl bg-black/5 dark:bg-white/5 border border-theme border-dashed">
+              <div class="flex items-center gap-2.5">
+                <div class="w-7 h-7 rounded-full bg-slate-500 text-white flex items-center justify-center font-bold text-[10px]">AD</div>
+                <span class="font-extrabold">Admin Portion</span>
+              </div>
+              <span class="font-black">₹${adminPortion.toFixed(2)}</span>
+            </div>
+
+            <!-- Friend Splits Portion -->
+            ${splitsHTML}
+          </div>
+        </div>
+
+        <!-- Comments Engine -->
+        <div class="space-y-3 border-t border-theme pt-5">
+          <h4 class="text-xs font-bold text-theme-muted uppercase tracking-wider flex items-center gap-1.5">
+            <i data-lucide="message-square" class="w-4 h-4"></i> Comments Thread (${(exp.comments || []).length})
+          </h4>
+          <form onsubmit="addComment(event, '${exp.id}')" class="flex gap-2">
+            <input type="text" name="commentInput" placeholder="Add a coordinate note..." required class="flex-grow bg-black/10 dark:bg-white/5 border border-theme rounded-xl py-2 px-3.5 text-xs focus:outline-none focus:ring-1 focus:ring-emerald-500">
+            <button type="submit" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-3.5 py-2 rounded-xl text-xs shadow transition">Post</button>
+          </form>
+          <div class="space-y-3 mt-4">
+            ${commentsHTML}
+            ${(!exp.comments || exp.comments.length === 0) ? '<p class="text-xs text-theme-muted italic text-center py-2">No comments posted.</p>' : ''}
+          </div>
+        </div>
+      `;
+
+      // Footer Render
+      if (state.currentRole === 'admin') {
+        footer.innerHTML = `
+          <button onclick="deleteExpense('${exp.id}')" class="text-xs font-bold text-red-500 hover:text-red-400 bg-red-500/10 border border-red-500/20 py-2.5 px-3.5 rounded-xl hover:bg-red-500/20 transition flex items-center gap-1">
+            <i data-lucide="trash-2" class="w-4 h-4"></i> Delete Record
+          </button>
+          <button onclick="closeDrawer()" class="py-2.5 px-4.5 rounded-xl border border-theme hover:bg-black/10 dark:hover:bg-white/5 text-xs font-bold transition">Close</button>
+        `;
+      } else {
+        footer.innerHTML = `
+          <div></div>
+          <button onclick="closeDrawer()" class="py-2.5 px-4.5 rounded-xl border border-theme hover:bg-black/10 dark:hover:bg-white/5 text-xs font-bold transition">Close</button>
+        `;
+      }
+
+      lucide.createIcons();
+    }
+
+    function closeDrawer() {
+      state.selectedExpenseId = null;
+      document.getElementById('detail-drawer').classList.add('hidden');
+    }
+
+    function openLightbox(img) {
+      document.getElementById('lightbox-img').src = img;
+      document.getElementById('lightbox').classList.remove('hidden');
+    }
+
+    function closeCardModal() {
+      document.getElementById('card-modal').classList.add('hidden');
+    }
+
+    // ==============================================================
+    // ============ RENDER CONTROLLER ===============================
+    // ==============================================================
+    function render() {
+      // Toggle empty state visuals globally if database is clean
+      const hasCards = state.cards.length > 0;
+
+      if (!hasCards && state.users.length === 0 && state.expenses.length === 0) {
+        document.getElementById('overview-stats-grid').innerHTML = `
+          <div class="glass-surface p-8 rounded-3xl text-center sm:col-span-3 border border-theme border-dashed">
+            <i data-lucide="credit-card" class="w-12 h-12 text-emerald-400 mx-auto mb-3"></i>
+            <h3 class="text-lg font-bold text-theme-main">Welcome to ccShare!</h3>
+            <p class="text-xs text-theme-muted max-w-md mx-auto mt-2 leading-relaxed">
+              To begin splitting bills, click the tabs above or use the "Testing Controls" below to instantly seed high-fidelity demo values in Rupees (₹) to test features.
+            </p>
+            <div class="mt-6 flex flex-wrap gap-4 justify-center">
+              <button onclick="openCardModal()" class="admin-only bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2.5 px-5 rounded-xl text-xs transition shadow flex items-center gap-1.5"><i data-lucide="plus" class="w-4 h-4"></i> Add Shared Card</button>
+              <button onclick="openFriendModal()" class="admin-only bg-black/10 dark:bg-white/5 border border-theme hover:bg-black/20 text-theme-muted hover:text-current font-bold py-2.5 px-5 rounded-xl text-xs transition flex items-center gap-1.5"><i data-lucide="users" class="w-4 h-4"></i> Register Friend</button>
+            </div>
+          </div>
+        `;
+        document.getElementById('dashboard-cards-grid').innerHTML = '<p class="text-xs text-theme-muted text-center py-6 col-span-2">No active credit cards compiled.</p>';
+        document.getElementById('upcoming-bills-feed').innerHTML = '<p class="text-xs text-theme-muted text-center py-4">No credit cards added to calculate billing cycles.</p>';
+        document.getElementById('friends-ledger-summary').innerHTML = '<p class="text-xs text-theme-muted text-center py-4">No friends registered database.</p>';
+        document.getElementById('analytics-section').classList.add('hidden');
+        document.getElementById('expenses-feed-list').innerHTML = '<p class="text-xs text-theme-muted text-center py-10">No payment records found.</p>';
+        document.getElementById('cards-feed-grid').innerHTML = '<p class="text-xs text-theme-muted text-center py-10 col-span-3">No credit cards added portfolio.</p>';
+        document.getElementById('friends-feed-grid').innerHTML = '<p class="text-xs text-theme-muted text-center py-10 col-span-2">No friends registered database.</p>';
+        
+        lucide.createIcons();
+        return;
+      }
+
+      document.getElementById('analytics-section').classList.remove('hidden');
+
+      // Update active filters lists
+      const cardFilter = document.getElementById('filter-card');
+      const activeCardFilterVal = cardFilter.value;
+      cardFilter.innerHTML = '<option value="all">All Cards</option>';
+      const visibleFilterCards = state.currentRole === 'admin' ? state.cards : state.cards.filter(c => 
+        state.expenses.some(e => e.cardId === c.id && e.splits.some(sp => sp.userId === state.currentRole))
+      );
+      visibleFilterCards.forEach(c => {
+        cardFilter.add(new Option(c.name, c.id));
+      });
+      cardFilter.value = activeCardFilterVal;
+
+      // Render dashboard based on role
+      if (state.activeTab === 'dashboard') {
+        renderDashboardTab();
+      } else if (state.activeTab === 'expenses') {
+        renderExpensesTab();
+      } else if (state.activeTab === 'cards') {
+        renderCardsTab();
+      } else if (state.activeTab === 'friends') {
+        renderFriendsTab();
+      }
+
+      // Dynamically toggle admin-only classes based on current active role
+      const isAdmin = state.currentRole === 'admin';
+      const adminElements = document.querySelectorAll('.admin-only');
+      adminElements.forEach(el => {
+        if (isAdmin) {
+          el.classList.remove('hidden');
+        } else {
+          el.classList.add('hidden');
+        }
+      });
+
+      // Re-trigger icon load
+      lucide.createIcons();
+    }
+
+    function renderDashboardTab() {
+      const stats = calculateAggregateStats();
+      const friend = calculateFriendStats();
+      
+      const grid = document.getElementById('overview-stats-grid');
+      
+      if (state.currentRole === 'admin') {
+        document.getElementById('shared-cards-title').textContent = 'Active Shared Cards';
+        grid.innerHTML = `
+          <div class="glass-surface p-5 rounded-3xl bg-gradient-to-br from-white/5 to-emerald-500/5">
+            <div class="flex justify-between items-center text-theme-muted mb-2">
+              <span class="text-[10px] font-bold uppercase tracking-widest">Friends Owe You</span>
+              <i data-lucide="arrow-up-right" class="w-4.5 h-4.5 text-emerald-400"></i>
+            </div>
+            <h3 class="text-2xl font-black">₹${stats.totalOutstanding.toFixed(2)}</h3>
+            <p class="text-[10px] text-theme-muted mt-1 font-semibold">Active outstanding dues</p>
+          </div>
+
+          <div class="glass-surface p-5 rounded-3xl">
+            <div class="flex justify-between items-center text-theme-muted mb-2">
+              <span class="text-[10px] font-bold uppercase tracking-widest">Total Utilized</span>
+              <i data-lucide="credit-card" class="w-4.5 h-4.5 text-indigo-400"></i>
+            </div>
+            <h3 class="text-2xl font-black">₹${stats.totalSpent.toFixed(2)}</h3>
+            <p class="text-[10px] text-theme-muted mt-1 font-semibold">Utilization: ${stats.utilization.toFixed(1)}%</p>
+          </div>
+
+          <div class="glass-surface p-5 rounded-3xl">
+            <div class="flex justify-between items-center text-theme-muted mb-2">
+              <span class="text-[10px] font-bold uppercase tracking-widest">Active Cards</span>
+              <i data-lucide="users" class="w-4.5 h-4.5 text-teal-400"></i>
+            </div>
+            <h3 class="text-2xl font-black">${state.cards.length} Cards</h3>
+            <p class="text-[10px] text-theme-muted mt-1 font-semibold">Shared with ${state.users.length} friends</p>
+          </div>
+        `;
+      } else {
+        const friendName = state.users.find(u => u.id === state.currentRole)?.name || 'Friend';
+        document.getElementById('shared-cards-title').textContent = `My Shared Cards (${friendName})`;
+        grid.innerHTML = `
+          <div class="glass-surface p-5 rounded-3xl bg-gradient-to-br from-white/5 to-rose-500/5">
+            <div class="flex justify-between items-center text-theme-muted mb-2">
+              <span class="text-[10px] font-bold uppercase tracking-widest">Your Outstanding Balance</span>
+              <i data-lucide="alert-circle" class="w-4.5 h-4.5 text-amber-500 animate-pulse"></i>
+            </div>
+            <h3 class="text-2xl font-black">₹${friend.outstanding.toFixed(2)}</h3>
+            <p class="text-[10px] text-theme-muted mt-1 font-semibold">Pending payback to Admin</p>
+          </div>
+
+          <div class="glass-surface p-5 rounded-3xl bg-gradient-to-br from-white/5 to-blue-500/5">
+            <div class="flex justify-between items-center text-theme-muted mb-2">
+              <span class="text-[10px] font-bold uppercase tracking-widest">Awaiting Verification</span>
+              <i data-lucide="clock" class="w-4.5 h-4.5 text-blue-400"></i>
+            </div>
+            <h3 class="text-2xl font-black">₹${friend.awaitingApproval.toFixed(2)}</h3>
+            <p class="text-[10px] text-theme-muted mt-1 font-semibold">Marked paid, pending admin review</p>
+          </div>
+
+          <div class="glass-surface p-5 rounded-3xl bg-gradient-to-br from-white/5 to-emerald-500/5">
+            <div class="flex justify-between items-center text-theme-muted mb-2">
+              <span class="text-[10px] font-bold uppercase tracking-widest">Your Settled Dues</span>
+              <i data-lucide="check" class="w-4.5 h-4.5 text-emerald-400"></i>
+            </div>
+            <h3 class="text-2xl font-black">₹${friend.settled.toFixed(2)}</h3>
+            <p class="text-[10px] text-theme-muted mt-1 font-semibold">Total splits: ${friend.totalCount}</p>
+          </div>
+        `;
+      }
+
+      // Render Charts insights as premium native SVG graphs
+      const chartBox = document.getElementById('analytics-container');
+      if (state.cards.length > 0 && state.expenses.length > 0) {
+        
+        let cardSlices = '';
+        let totalVal = 0;
+        
+        if (state.currentRole === 'admin') {
+          totalVal = Object.values(stats.cardSpent).reduce((a,b)=>a+b,0);
+          let startAngle = 0;
+          state.cards.forEach((c, i) => {
+            const val = stats.cardSpent[c.id] || 0;
+            if (val === 0 || totalVal === 0) return;
+            const angle = (val / totalVal) * 360;
+            const x1 = 100 + 70 * Math.cos(Math.PI * startAngle / 180);
+            const y1 = 100 + 70 * Math.sin(Math.PI * startAngle / 180);
+            const x2 = 100 + 70 * Math.cos(Math.PI * (startAngle + angle) / 180);
+            const y2 = 100 + 70 * Math.sin(Math.PI * (startAngle + angle) / 180);
+            const largeArc = angle > 180 ? 1 : 0;
+            const color = i === 0 ? '#10b981' : i === 1 ? '#6366f1' : '#f59e0b';
+            
+            cardSlices += `<path d="M 100 100 L ${x1} ${y1} A 70 70 0 ${largeArc} 1 ${x2} ${y2} Z" fill="${color}" stroke="var(--bg-surface)" stroke-width="2"/>`;
+            startAngle += angle;
+          });
+        } else {
+          // Standard User: Pie chart shows their share of dues on each card!
+          let friendCardPortion = {};
+          state.cards.forEach(c => friendCardPortion[c.id] = 0);
+          
+          state.expenses.forEach(e => {
+            const split = e.splits.find(s => s.userId === state.currentRole);
+            if (split) {
+              friendCardPortion[e.cardId] += split.amount;
+            }
+          });
+
+          totalVal = Object.values(friendCardPortion).reduce((a,b)=>a+b,0);
+          
+          let startAngle = 0;
+          state.cards.forEach((c, i) => {
+            const val = friendCardPortion[c.id] || 0;
+            if (val === 0 || totalVal === 0) return;
+            const angle = (val / totalVal) * 360;
+            const x1 = 100 + 70 * Math.cos(Math.PI * startAngle / 180);
+            const y1 = 100 + 70 * Math.sin(Math.PI * startAngle / 180);
+            const x2 = 100 + 70 * Math.cos(Math.PI * (startAngle + angle) / 180);
+            const y2 = 100 + 70 * Math.sin(Math.PI * (startAngle + angle) / 180);
+            const largeArc = angle > 180 ? 1 : 0;
+            const color = i === 0 ? '#10b981' : i === 1 ? '#6366f1' : '#f59e0b';
+            
+            cardSlices += `<path d="M 100 100 L ${x1} ${y1} A 70 70 0 ${largeArc} 1 ${x2} ${y2} Z" fill="${color}" stroke="var(--bg-surface)" stroke-width="2"/>`;
+            startAngle += angle;
+          });
+        }
+
+        // Bar Chart of friend indebted list (Admin) or specific stats message (Friend)
+        let friendBars = '';
+        if (state.currentRole === 'admin') {
+          state.users.forEach((u, i) => {
+            let due = 0;
+            state.expenses.forEach(e => {
+              const sp = e.splits.find(s => s.userId === u.id);
+              if (sp && sp.status !== 'settled') due += sp.amount;
+            });
+            const barHeight = Math.min((due / Math.max(...state.users.map(u => 10000), 1)) * 120, 120);
+            friendBars += `
+              <div class="flex flex-col items-center gap-1.5 h-40 justify-end">
+                <span class="text-[9px] font-bold">₹${due.toFixed(0)}</span>
+                <div class="w-6 rounded-t-lg bg-emerald-500 transition-all duration-300" style="height: ${barHeight}px"></div>
+                <span class="text-[9px] text-theme-muted truncate max-w-[50px] font-semibold">${u.name.split(' ')[0]}</span>
+              </div>
+            `;
+          });
+        }
+
+        chartBox.innerHTML = `
+          <div class="flex flex-col items-center">
+            <span class="text-xs font-bold text-theme-muted mb-2">${state.currentRole === 'admin' ? 'Spends by Card Share' : 'Your Share by Card'}</span>
+            <div class="relative w-44 h-44">
+              <svg viewBox="0 0 200 200" class="w-full h-full transform -rotate-90">
+                ${cardSlices || '<circle cx="100" cy="100" r="70" fill="rgba(255,255,255,0.03)" stroke="var(--border-main)" stroke-width="2"/>'}
+                <circle cx="100" cy="100" r="45" fill="var(--bg-surface)"/>
+              </svg>
+              <div class="absolute inset-0 flex flex-col justify-center items-center">
+                <span class="text-[9px] text-theme-muted uppercase tracking-wider font-semibold">${state.currentRole === 'admin' ? 'Total Spends' : 'Your Share'}</span>
+                <span class="text-xs font-black">₹${totalVal.toFixed(0)}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex flex-col items-center justify-center">
+            ${state.currentRole === 'admin' ? `
+              <span class="text-xs font-bold text-theme-muted mb-2">Outstanding Dues</span>
+              <div class="flex items-end gap-5 h-44 border-b border-theme pb-2 w-full justify-center">
+                ${friendBars}
+              </div>
+            ` : `
+              <div class="text-center p-4 bg-black/5 dark:bg-white/5 border border-theme rounded-2xl">
+                <i data-lucide="shield-check" class="w-8 h-8 text-emerald-400 mx-auto mb-2 border border-emerald-400/20 p-1.5 rounded-full bg-emerald-400/10"></i>
+                <h4 class="text-xs font-extrabold text-theme-main">Secure Friend Ledger</h4>
+                <p class="text-[10px] text-theme-muted max-w-[200px] mt-1 leading-relaxed">
+                  You are viewing a restricted portal. You only see expenses and credit card balances you are explicitly a part of in split payments.
+                </p>
+              </div>
+            `}
+          </div>
+        `;
+      } else {
+        chartBox.innerHTML = '<p class="text-xs text-theme-muted text-center py-8 col-span-2">No payment transactions recorded. Spends analysis automatically compiles here.</p>';
+      }
+
+      // Render Active Cards lists (Filtered dynamically for friends)
+      const cardsGrid = document.getElementById('dashboard-cards-grid');
+      cardsGrid.innerHTML = '';
+      
+      const visibleCards = state.currentRole === 'admin' ? state.cards : state.cards.filter(c => 
+        state.expenses.some(e => e.cardId === c.id && e.splits.some(sp => sp.userId === state.currentRole))
+      );
+
+      visibleCards.forEach(c => {
+        const cSpent = stats.cardSpent[c.id] || 0;
+        const available = c.limit - cSpent;
+        const util = c.limit > 0 ? (cSpent / c.limit) * 100 : 0;
+        const dueInfo = getDueDaysStatus(c.dueDate);
+
+        const card = document.createElement('div');
+        card.className = `p-6 bg-gradient-to-tr ${c.color} text-white rounded-3xl shadow-xl flex flex-col justify-between h-48 border-0 hover:scale-[1.01] transition duration-200 relative overflow-hidden`;
+        
+        let subDetails = '';
+        if (state.currentRole === 'admin') {
+          subDetails = `
+            <div class="my-2 z-10">
+              <div class="flex justify-between text-xs font-bold mb-1">
+                <span>₹${cSpent.toFixed(0)} spent</span>
+                <span class="opacity-80">₹${available.toFixed(0)} limit</span>
+              </div>
+              <div class="w-full bg-white/20 h-2 rounded-full overflow-hidden">
+                <div class="bg-emerald-400 h-full rounded-full" style="width: ${Math.min(util, 100)}%"></div>
+              </div>
+            </div>
+            <div class="flex justify-between items-end z-10">
+              <div>
+                <p class="text-[8px] uppercase tracking-wider opacity-60">Total Limit</p>
+                <p class="text-base font-black">₹${c.limit.toLocaleString()}</p>
+              </div>
+              <div class="admin-only flex gap-1.5">
+                <button onclick="openCardModal('${c.id}')" class="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 transition"><i data-lucide="edit" class="w-3.5 h-3.5"></i></button>
+                <button onclick="deleteCard('${c.id}')" class="p-1.5 rounded-lg bg-white/10 hover:bg-red-500/20 text-red-100 hover:text-red-200 transition"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+              </div>
+            </div>
+          `;
+        } else {
+          // Standard User: Card Spent, Available Limit and Progress Bar MUST BE COMMON!
+          let myOutstandingOnCard = 0;
+          state.expenses.filter(e => e.cardId === c.id).forEach(exp => {
+            const sp = exp.splits.find(s => s.userId === state.currentRole);
+            if (sp && sp.status !== 'settled') {
+              myOutstandingOnCard += sp.amount;
+            }
+          });
+
+          subDetails = `
+            <div class="my-2 z-10">
+              <!-- COMMON remaining limit and overall card utilization bar -->
+              <div class="flex justify-between text-[11px] font-bold mb-1">
+                <span>₹${cSpent.toFixed(0)} overall spent</span>
+                <span class="opacity-80">₹${available.toFixed(0)} limit remaining</span>
+              </div>
+              <div class="w-full bg-white/20 h-2 rounded-full overflow-hidden">
+                <div class="bg-emerald-400 h-full rounded-full" style="width: ${Math.min(util, 100)}%"></div>
+              </div>
+            </div>
+            <div class="flex justify-between items-end z-10">
+              <div>
+                <p class="text-[8px] uppercase tracking-wider opacity-60">Total Limit</p>
+                <p class="text-base font-black">₹${c.limit.toLocaleString()}</p>
+              </div>
+              <div class="text-[10px] font-black text-emerald-400 bg-emerald-400/10 px-2 py-0.5 rounded border border-emerald-400/20">
+                ${myOutstandingOnCard > 0 ? `You owe: ₹${myOutstandingOnCard.toFixed(0)}` : 'Fully Settled 🤝'}
+              </div>
+            </div>
+          `;
+        }
+
+        card.innerHTML = `
+          <div class="absolute right-0 bottom-0 w-24 h-24 bg-white/5 rounded-full translate-x-8 translate-y-8"></div>
+          <div class="absolute right-8 bottom-4 w-12 h-12 bg-white/5 rounded-full translate-x-2"></div>
+          
+          <div class="flex justify-between items-start z-10">
+            <div>
+              <h4 class="text-sm font-extrabold opacity-95 truncate max-w-[180px]">${c.name}</h4>
+              <p class="text-[10px] uppercase font-bold tracking-widest opacity-60 mt-0.5">•••• ${c.number}</p>
+            </div>
+            <span class="text-[9px] font-black px-2 py-0.5 rounded-full ${dueInfo.color}">
+              ${dueInfo.text}
+            </span>
+          </div>
+
+          ${subDetails}
+        `;
+        cardsGrid.appendChild(card);
+      });
+
+      if (visibleCards.length === 0) {
+        cardsGrid.innerHTML = '<p class="text-xs text-theme-muted text-center py-6 col-span-2">No active credit cards compiled.</p>';
+      }
+
+      // Sidebar alerts due lists (Filtered dynamically for friends)
+      const dueList = document.getElementById('upcoming-bills-feed');
+      dueList.innerHTML = '';
+      
+      const visibleDueCards = state.currentRole === 'admin' ? state.cards : state.cards.filter(c => 
+        state.expenses.some(e => e.cardId === c.id && e.splits.some(sp => sp.userId === state.currentRole))
+      );
+
+      visibleDueCards.forEach(c => {
+        const dueInfo = getDueDaysStatus(c.dueDate);
+        const div = document.createElement('div');
+        div.className = 'p-3.5 rounded-2xl border border-theme bg-black/5 dark:bg-white/5 flex justify-between items-center text-xs';
+        div.innerHTML = `
+          <div>
+            <h4 class="font-extrabold leading-none truncate max-w-[150px]">${c.name}</h4>
+            <p class="text-[10px] text-theme-muted mt-1.5 font-medium">Cycle: Gen ${c.billGenDate}th · Due ${c.dueDate}th</p>
+          </div>
+          <span class="text-[9px] font-black px-2 py-0.5 rounded-full ${dueInfo.color}">${dueInfo.text}</span>
+        `;
+        dueList.appendChild(div);
+      });
+
+      if (visibleDueCards.length === 0) {
+        dueList.innerHTML = '<p class="text-xs text-theme-muted text-center py-4">No cards associated with your splits.</p>';
+      }
+
+      // Sidebar Friends Ledger list (Only visible to admin)
+      if (state.currentRole === 'admin') {
+        const frsList = document.getElementById('friends-ledger-summary');
+        frsList.innerHTML = '';
+        state.users.forEach(u => {
+          let outstanding = 0;
+          let verifying = 0;
+
+          state.expenses.forEach(e => {
+            const split = e.splits.find(sp => sp.userId === u.id);
+            if (split) {
+              if (split.status === 'pending') outstanding += split.amount;
+              else if (split.status === 'paid') verifying += split.amount;
+            }
+          });
+
+          const div = document.createElement('div');
+          div.className = 'flex justify-between items-center text-xs';
+          div.innerHTML = `
+            <div class="flex items-center gap-2">
+              <div class="w-8 h-8 rounded-full bg-gradient-to-tr ${u.avatarColor} text-white flex items-center justify-center font-bold text-[10px]">
+                ${u.name.split(' ').map(n => n[0]).join('')}
+              </div>
+              <div>
+                <h4 class="font-extrabold leading-none">${u.name}</h4>
+                <p class="text-[10px] text-theme-muted mt-1 leading-none">${u.phone}</p>
+              </div>
+            </div>
+            <div class="text-right">
+              ${verifying > 0 ? `<p class="text-[9px] font-black text-blue-400 bg-blue-500/10 px-1 py-0.5 rounded leading-none inline-block mb-1">₹${verifying.toFixed(2)} paid</p>` : ''}
+              <p class="font-bold ${outstanding > 0 ? 'text-amber-500' : 'text-emerald-400'}">${outstanding > 0 ? `₹${outstanding.toFixed(2)} outstanding` : 'Fully Settled 🤝'}</p>
+            </div>
+          `;
+          frsList.appendChild(div);
+        });
+      }
+    }
+
+    function renderExpensesTab() {
+      const feed = document.getElementById('expenses-feed-list');
+      feed.innerHTML = '';
+
+      const searchVal = document.getElementById('expense-search').value.toLowerCase();
+      const cardFilterVal = document.getElementById('filter-card').value;
+      const statusFilterVal = document.getElementById('filter-status').value;
+
+      const filtered = state.expenses.filter(e => {
+        // Role filter (Friend only sees their own splits)
+        if (state.currentRole !== 'admin') {
+          const part = e.splits.some(s => s.userId === state.currentRole);
+          if (!part) return false;
+        }
+
+        // Search Filter
+        const matchSearch = e.title.toLowerCase().includes(searchVal) || e.notes.toLowerCase().includes(searchVal);
+        
+        // Card filter
+        const matchCard = cardFilterVal === 'all' || e.cardId === cardFilterVal;
+
+        // Status Filter
+        let matchStatus = true;
+        if (statusFilterVal !== 'all') {
+          if (state.currentRole === 'admin') {
+            const allSettled = e.splits.every(s => s.status === 'settled');
+            const anyPending = e.splits.some(s => s.status === 'pending');
+            const anyPaid = e.splits.some(s => s.status === 'paid');
+
+            if (statusFilterVal === 'settled') matchStatus = allSettled;
+            else if (statusFilterVal === 'pending') matchStatus = anyPending;
+            else if (statusFilterVal === 'paid') matchStatus = anyPaid && !allSettled;
+          } else {
+            const myPortion = e.splits.find(s => s.userId === state.currentRole);
+            matchStatus = myPortion && myPortion.status === statusFilterVal;
+          }
+        }
+
+        return matchSearch && matchCard && matchStatus;
+      });
+
+      filtered.forEach(exp => {
+        const card = state.cards.find(c => c.id === exp.cardId);
+        
+        // Portions details metrics
+        const totalPortions = exp.splits.length;
+        const settledCount = exp.splits.filter(s => s.status === 'settled').length;
+        const paidCount = exp.splits.filter(s => s.status === 'paid').length;
+        const pendingCount = exp.splits.filter(s => s.status === 'pending').length;
+
+        let statusTextBadge = '';
+        if (state.currentRole === 'admin') {
+          if (settledCount === totalPortions) {
+            statusTextBadge = `<span class="px-2 py-0.5 rounded text-[9px] font-bold bg-emerald-500/10 text-emerald-400">Fully Settled</span>`;
+          } else {
+            statusTextBadge = `<span class="px-2 py-0.5 rounded text-[9px] font-bold bg-amber-500/10 text-amber-500">${pendingCount} Pending · ${paidCount} Paid</span>`;
+          }
+        } else {
+          const myPortion = exp.splits.find(s => s.userId === state.currentRole);
+          const color = myPortion.status === 'settled' ? 'bg-emerald-500/10 text-emerald-400' :
+                        myPortion.status === 'paid' ? 'bg-blue-500/10 text-blue-400 animate-pulse' :
+                        'bg-amber-500/10 text-amber-500';
+          statusTextBadge = `<span class="px-2 py-0.5 rounded text-[9px] font-bold uppercase ${color}">Portion: ${myPortion.status}</span>`;
+        }
+
+        const div = document.createElement('div');
+        div.className = 'glass-surface glass-surface-hover p-4 rounded-2xl shadow-sm border border-theme flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 cursor-pointer transition';
+        div.onclick = () => openDrawer(exp.id);
+
+        div.innerHTML = `
+          <div class="flex items-center gap-3.5">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr ${card?.color || 'from-emerald-500 to-teal-700'} text-white flex items-center justify-center font-bold text-xs shadow-md">
+              <i data-lucide="credit-card" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <h3 class="font-extrabold text-sm sm:text-base leading-tight">${exp.title}</h3>
+              <p class="text-[10px] text-theme-muted mt-1.5 font-semibold">
+                ${exp.date} · Charged on <span class="text-theme-main">${card?.name || 'Card'}</span>
+              </p>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap gap-2.5 items-center">
+            ${statusTextBadge}
+            ${exp.screenshot ? '<i data-lucide="eye" class="w-3.5 h-3.5 text-theme-muted"></i>' : ''}
+            ${exp.comments?.length > 0 ? `<span class="text-xs text-theme-muted font-bold flex items-center gap-0.5"><i data-lucide="message-square" class="w-3.5 h-3.5"></i> ${exp.comments.length}</span>` : ''}
+          </div>
+
+          <div class="text-right flex sm:flex-col justify-between items-center sm:items-end w-full sm:w-auto border-t sm:border-t-0 border-theme/40 pt-2 sm:pt-0">
+            <span class="text-xs text-theme-muted sm:hidden font-bold">Total Payment Amount</span>
+            <span class="text-sm sm:text-base font-black">₹${exp.amount.toFixed(2)}</span>
+          </div>
+        `;
+        feed.appendChild(div);
+      });
+
+      if (filtered.length === 0) {
+        feed.innerHTML = '<p class="text-xs text-theme-muted text-center py-10">No payments found matching active constraints.</p>';
+      }
+    }
+
+    // --- Developer Control Panels ---
+    function renderCardsTab() {
+      const grid = document.getElementById('cards-feed-grid');
+      grid.innerHTML = '';
+      const stats = calculateAggregateStats();
+
+      state.cards.forEach(c => {
+        const spent = stats.cardSpent[c.id] || 0;
+        const available = c.limit - spent;
+        const util = c.limit > 0 ? (spent / c.limit) * 100 : 0;
+        const dueInfo = getDueDaysStatus(c.dueDate);
+
+        const card = document.createElement('div');
+        card.className = 'glass-surface p-5 rounded-3xl border border-theme shadow flex flex-col justify-between h-56';
+        
+        card.innerHTML = `
+          <div class="flex justify-between items-start">
+            <div class="flex items-center gap-2">
+              <div class="w-3 rounded-full h-3 bg-gradient-to-tr ${c.color}"></div>
+              <h3 class="font-extrabold leading-none truncate max-w-[150px]">${c.name}</h3>
+            </div>
+            <span class="text-[9px] font-black px-2 py-0.5 rounded-full ${dueInfo.color}">${dueInfo.text}</span>
+          </div>
+
+          <div class="my-4">
+            <div class="flex justify-between text-xs font-bold text-theme-muted mb-1">
+              <span>Utilized (${util.toFixed(1)}%)</span>
+              <span class="text-theme-main">₹${spent.toFixed(0)} / ₹${c.limit.toLocaleString()}</span>
+            </div>
+            <div class="w-full bg-black/10 dark:bg-white/5 border border-theme h-2 rounded-full overflow-hidden">
+              <div class="h-full rounded-full ${util > 80 ? 'bg-red-500' : 'bg-emerald-500'}" style="width: ${Math.min(util, 100)}%"></div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2 text-xs border-t border-theme pt-3 text-theme-muted">
+            <div>
+              <span class="block text-[9px] uppercase tracking-wider text-theme-muted font-bold">Bill Gen Day</span>
+              <span class="font-bold text-theme-main">${c.billGenDate}th</span>
+            </div>
+            <div>
+              <span class="block text-[9px] uppercase tracking-wider text-theme-muted font-bold">Card Number</span>
+              <span class="font-bold text-theme-main">Ending in ${c.number}</span>
+            </div>
+          </div>
+
+          <div class="flex justify-end gap-2.5 mt-4 pt-2">
+            <button onclick="openCardModal('${c.id}')" class="p-1.5 border border-theme rounded-xl text-theme-muted hover:text-current hover:bg-black/5 dark:hover:bg-white/5 transition"><i data-lucide="edit" class="w-3.5 h-3.5"></i></button>
+            <button onclick="deleteCard('${c.id}')" class="p-1.5 border border-red-500/10 text-red-500/80 hover:text-red-500 hover:bg-red-500/5 rounded-xl transition"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+
+      if (state.cards.length === 0) {
+        grid.innerHTML = '<p class="text-xs text-theme-muted text-center py-10 col-span-3">No credit cards added portfolio.</p>';
+      }
+    }
+
+    function renderFriendsTab() {
+      const grid = document.getElementById('friends-feed-grid');
+      grid.innerHTML = '';
+
+      state.users.forEach(u => {
+        let outstanding = 0;
+        let verifying = 0;
+        let transactions = [];
+
+        state.expenses.forEach(e => {
+          const split = e.splits.find(sp => sp.userId === u.id);
+          if (split) {
+            transactions.push({ title: e.title, amount: split.amount, status: split.status });
+            if (split.status === 'pending') outstanding += split.amount;
+            else if (split.status === 'paid') verifying += split.amount;
+          }
+        });
+
+        const card = document.createElement('div');
+        card.className = 'glass-surface p-5 rounded-3xl border border-theme shadow flex flex-col justify-between';
+        
+        let txHTML = '';
+        transactions.slice(0, 3).forEach(tx => {
+          const statusColor = tx.status === 'settled' ? 'bg-emerald-500/10 text-emerald-400' :
+                              tx.status === 'paid' ? 'bg-blue-500/10 text-blue-400' :
+                              'bg-amber-500/10 text-amber-500';
+          txHTML += `
+            <div class="flex justify-between items-center text-xs">
+              <span class="text-theme-muted font-medium truncate max-w-[150px]">${tx.title}</span>
+              <div class="flex items-center gap-2 font-semibold">
+                <span>₹${tx.amount.toFixed(2)}</span>
+                <span class="text-[9px] px-1.5 py-0.5 rounded uppercase ${statusColor}">${tx.status}</span>
+              </div>
+            </div>
+          `;
+        });
+
+        card.innerHTML = `
+          <div>
+            <div class="flex items-center justify-between pb-3 border-b border-theme">
+              <div class="flex items-center gap-3">
+                <div class="w-11 h-11 rounded-full bg-gradient-to-tr ${u.avatarColor} text-white flex items-center justify-center font-bold text-xs shadow-md">
+                  ${u.name.split(' ').map(n => n[0]).join('')}
+                </div>
+                <div>
+                  <h3 class="font-extrabold leading-none">${u.name}</h3>
+                  <p class="text-xs text-theme-muted mt-1.5 font-medium">${u.email} · ${u.phone}</p>
+                </div>
+              </div>
+              
+              <!-- Trash Button to Delete Friend -->
+              <button onclick="deleteFriend('${u.id}')" class="p-2 border border-red-500/10 text-red-500/80 hover:text-red-500 hover:bg-red-500/5 rounded-xl transition">
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+              </button>
+            </div>
+
+            <!-- Ledger stats -->
+            <div class="grid grid-cols-2 gap-3.5 my-3.5 p-3 rounded-2xl bg-black/5 dark:bg-white/5 border border-theme">
+              <div>
+                <span class="block text-[8px] uppercase tracking-wider text-theme-muted font-bold">Outstanding Portion</span>
+                <span class="text-sm font-black ${outstanding > 0 ? 'text-amber-500' : 'text-emerald-400'}">₹${outstanding.toFixed(2)}</span>
+              </div>
+              <div>
+                <span class="block text-[8px] uppercase tracking-wider text-theme-muted font-bold">Verifying Payback</span>
+                <span class="text-sm font-black ${verifying > 0 ? 'text-blue-400' : 'text-theme-muted'}">₹${verifying.toFixed(2)}</span>
+              </div>
+            </div>
+
+            <!-- Recent micro ledger -->
+            <div class="space-y-2 mt-4">
+              <h4 class="text-[9px] uppercase font-bold tracking-widest text-theme-muted mb-2">Split Participations</h4>
+              ${txHTML || '<p class="text-xs text-theme-muted italic">No portions split recorded.</p>'}
+            </div>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+
+      if (state.users.length === 0) {
+        grid.innerHTML = '<p class="text-xs text-theme-muted text-center py-10 col-span-2">No friends registered database.</p>';
+      }
+    }
+  </script>
+</body>
+</html>
